@@ -31,15 +31,16 @@ import { Button } from '@/components/ui/Button';
 import { ProjectExportMenu } from '@/components/projects/ProjectExportMenu';
 import { ActivityTimeline } from '@/components/projects/ActivityTimeline';
 import { ShareToXModal } from '@/components/projects/ShareToXModal';
-import { Share2 } from 'lucide-react';
+
 export default function ProjectDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const { projects, roadmaps, activities, toggleStepCompletion, selectProject } = useAppStore();
   
   // Local states
-const [activeTab, setActiveTab] = useState<'Overview' | 'Timeline' | 'Activity' | 'Sandbox' | 'Keywords'>('Overview');
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);  const [copiedKeywordIdx, setCopiedKeywordIdx] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Timeline' | 'Activity' | 'Sandbox' | 'Keywords'>('Overview');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [copiedKeywordIdx, setCopiedKeywordIdx] = useState<number | null>(null);
   
   // Find project based on slug params or active Zustand ID
   const projectId = params.id as string;
@@ -154,7 +155,8 @@ const [activeTab, setActiveTab] = useState<'Overview' | 'Timeline' | 'Activity' 
           <button className="p-3 bg-white/2 hover:bg-white/5 border border-white/5 rounded-xl text-slate-400 hover:text-white transition-all cursor-pointer">
             <Bookmark className="w-4.5 h-4.5" />
           </button>
-        </div>      </div>
+        </div>
+      </div>
 
       {/* Tabs navigation panel */}
       <div className="border-b border-white/5 flex flex-wrap gap-1">
