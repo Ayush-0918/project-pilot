@@ -23,6 +23,8 @@ export interface ChatSlice {
   activeReadingMessageId: string | null;
   setReadingMode: (isReadingMode: boolean, activeReadingMessageId?: string | null) => void;
 
+  translateLanguage: string | null;
+  setTranslateLanguage: (language: string | null) => void;
   sendMessage: (
   content: string,
   codeSnippet?: {
@@ -82,6 +84,8 @@ export const createChatSlice =
   setReadingMode: (isReadingMode, activeReadingMessageId = null) =>
     set({ isReadingMode, activeReadingMessageId }),
 
+  translateLanguage: null,
+  setTranslateLanguage: (language) => set({ translateLanguage: language }),
   sendMessage: (content, codeSnippet, attachments, options) =>
     set((state) => {
 
@@ -165,10 +169,10 @@ export const createChatSlice =
               userContext:get().user||DEFAULT_USER,
               isRoastMode,
               isMockInterview,
-              endInterview
+              endInterview,
+              translateLanguage:get().translateLanguage
             })
           });
-
           if(response.status===429){
             throw new Error("RATE_LIMIT_EXCEEDED");
           }
