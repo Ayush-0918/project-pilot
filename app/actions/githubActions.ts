@@ -4,13 +4,13 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 
 export async function fetchGithubOauthAnalytics() {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     
     if (!userId) {
       throw new Error("User not authenticated");
     }
 
-    const client = clerkClient();
+    const client = await clerkClient();
     const OauthAccessTokenResponse = await client.users.getUserOauthAccessToken(userId, 'oauth_github');
     
     const githubTokens = OauthAccessTokenResponse.data || OauthAccessTokenResponse;
