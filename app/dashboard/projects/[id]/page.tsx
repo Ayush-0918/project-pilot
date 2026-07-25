@@ -30,6 +30,7 @@ import { Progress } from '@/components/ui/Progress';
 import { Button } from '@/components/ui/Button';
 import { ProjectExportMenu } from '@/components/projects/ProjectExportMenu';
 import { ActivityTimeline } from '@/components/projects/ActivityTimeline';
+import { ShareToXModal } from '@/components/projects/ShareToXModal';
 
 export default function ProjectDetailsPage() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function ProjectDetailsPage() {
   
   // Local states
   const [activeTab, setActiveTab] = useState<'Overview' | 'Timeline' | 'Activity' | 'Sandbox' | 'Keywords'>('Overview');
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copiedKeywordIdx, setCopiedKeywordIdx] = useState<number | null>(null);
   
   // Find project based on slug params or active Zustand ID
@@ -139,6 +141,17 @@ export default function ProjectDetailsPage() {
               Discuss with AI Mentor
             </Button>
           </Link>
+{project.status === 'Completed' && (
+            <Button
+              variant="outline"
+              className="w-full text-xs h-11 border-indigo-500/30 hover:bg-indigo-500/10 text-indigo-300 hover:text-white"
+              leftIcon={<Share2 className="w-4 h-4" />}
+              onClick={() => setIsShareModalOpen(true)}
+            >
+              Share to X
+            </Button>
+          )}
+
           <button className="p-3 bg-white/2 hover:bg-white/5 border border-white/5 rounded-xl text-slate-400 hover:text-white transition-all cursor-pointer">
             <Bookmark className="w-4.5 h-4.5" />
           </button>
@@ -527,7 +540,18 @@ volumes:
           )}
 
         </AnimatePresence>
-      </div>
+</div>
+
+      {isShareModalOpen && (
+        <ShareToXModal
+          project={{
+            title: project.title,
+            description: project.description,
+            technologies: project.technologies,
+          }}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
