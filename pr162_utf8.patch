@@ -1,0 +1,409 @@
+﻿From 076e19550be97cc10690317af71bd535af3c052e Mon Sep 17 00:00:00 2001
+From: Revati Kadam <revatikadam0607@gmail.com>
+Date: Fri, 24 Jul 2026 22:19:10 +0530
+Subject: [PATCH] deletion
+
+---
+ .env.example                                  |  4 ++
+ app/actions/user.ts                           | 58 ++++++++++++++++
+ app/api/cron/purge-deleted-accounts/route.ts  | 32 +++++++++
+ app/dashboard/layout.tsx                      | 52 ++++++++++----
+ app/dashboard/settings/page.tsx               | 45 +++++++++---
+ .../dashboard/AccountRecoveryPrompt.tsx       | 69 +++++++++++++++++++
+ prisma/schema.prisma                          |  6 +-
+ 7 files changed, 238 insertions(+), 28 deletions(-)
+ create mode 100644 app/api/cron/purge-deleted-accounts/route.ts
+ create mode 100644 components/dashboard/AccountRecoveryPrompt.tsx
+
+diff --git a/.env.example b/.env.example
+index e8879c1..4c8d9d6 100644
+--- a/.env.example
++++ b/.env.example
+@@ -9,3 +9,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"
+ # Get these from your Clerk dashboard (https://clerk.com)
+ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_publishable_key"
+ CLERK_SECRET_KEY="your_clerk_secret_key"
++
++# Secret used to authorize the daily cron job that purges soft-deleted
++# accounts older than 30 days. Use any long random string.
++CRON_SECRET="your_random_cron_secret"
+\ No newline at end of file
+diff --git a/app/actions/user.ts b/app/actions/user.ts
+index c5fcccd..9677aa0 100644
+--- a/app/actions/user.ts
++++ b/app/actions/user.ts
+@@ -412,3 +412,61 @@ export async function getProfessionalLinks() {
+     return null;
+   }
+ }
++
++/**
++ * Soft-deletes the current user's account by flagging it with a deletedAt
++ * timestamp instead of removing the row. Recoverable for 30 days.
++ */
++export async function softDeleteAccount() {
++  let userId: string | null = null;
++
++  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
++    const session = await auth();
++    userId = session.userId;
++  } else if (process.env.NODE_ENV === "development") {
++    userId = "mock-developer-id";
++  }
++
++  if (!userId) {
++    throw new Error("Unauthenticated user attempt to delete account.");
++  }
++
++  try {
++    return await prisma.user.update({
++      where: { clerkId: userId },
++      data: { deletedAt: new Date() },
++    });
++  } catch (error) {
++    console.error("Failed to soft-delete account:", error);
++    throw error;
++  }
++}
++
++/**
++ * Restores a soft-deleted account by clearing the deletedAt flag.
++ * Called when a user logs back in within the 30-day recovery window.
++ */
++export async function restoreAccount() {
++  let userId: string | null = null;
++
++  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
++    const session = await auth();
++    userId = session.userId;
++  } else if (process.env.NODE_ENV === "development") {
++    userId = "mock-developer-id";
++  }
++
++  if (!userId) {
++    throw new Error("Unauthenticated user attempt to restore account.");
++  }
++
++  try {
++    return await prisma.user.update({
++      where: { clerkId: userId },
++      data: { deletedAt: null },
++    });
++  } catch (error) {
++    console.error("Failed to restore account:", error);
++    throw error;
++  }
++}
+\ No newline at end of file
+diff --git a/app/api/cron/purge-deleted-accounts/route.ts b/app/api/cron/purge-deleted-accounts/route.ts
+new file mode 100644
+index 0000000..51f6c91
+--- /dev/null
++++ b/app/api/cron/purge-deleted-accounts/route.ts
+@@ -0,0 +1,32 @@
++import { NextRequest, NextResponse } from "next/server";
++import { prisma } from "@/lib/prisma";
++
++// Runs daily via Vercel Cron (see vercel.json).
++// Permanently deletes any account whose 30-day recovery window has expired.
++export async function GET(request: NextRequest) {
++  const authHeader = request.headers.get("authorization");
++
++  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
++    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
++  }
++
++  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
++
++  try {
++    const result = await prisma.user.deleteMany({
++      where: {
++        deletedAt: {
++          lt: thirtyDaysAgo,
++        },
++      },
++    });
++
++    return NextResponse.json({ success: true, purgedCount: result.count }, { status: 200 });
++  } catch (error: any) {
++    console.error("GET /api/cron/purge-deleted-accounts error:", error);
++    return NextResponse.json(
++      { error: error?.message || "Failed to purge deleted accounts." },
++      { status: 500 },
++    );
++  }
++}
+\ No newline at end of file
+diff --git a/app/dashboard/layout.tsx b/app/dashboard/layout.tsx
+index 2e124f4..b05a899 100644
+--- a/app/dashboard/layout.tsx
++++ b/app/dashboard/layout.tsx
+@@ -2,11 +2,10 @@
+ 
+ import React, { useState, useEffect } from 'react';
+ import Link from 'next/link';
+-import { usePathname } from 'next/navigation';
+-import { useUser } from '@clerk/nextjs';
+-import { getCurrentUserProfile } from '@/app/actions/user';
++import { usePathname, useRouter } from 'next/navigation';
++import { useUser, useClerk } from '@clerk/nextjs';import { getCurrentUserProfile } from '@/app/actions/user';
+ import { CommandPalette } from '@/components/dashboard/CommandPalette';
+-import { MobileDrawer } from '@/components/layout/MobileDrawer';
++import { AccountRecoveryPrompt } from '@/components/dashboard/AccountRecoveryPrompt';import { MobileDrawer } from '@/components/layout/MobileDrawer';
+ import { Sidebar } from '@/components/layout/Sidebar';
+ import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+ import { EmptyState } from '@/components/ui/EmptyState';
+@@ -29,14 +28,15 @@ export default function DashboardLayout({
+ }: {
+   children: React.ReactNode;
+ }) {
+-  const pathname = usePathname();
+-  const { careerScore, projects, selectProject, syncUserProfile, isReadingMode } = useAppStore();
+-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
++const pathname = usePathname();
++  const router = useRouter();
++  const { signOut } = useClerk();
++  const { careerScore, projects, selectProject, syncUserProfile, isReadingMode } = useAppStore();  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+ 
+-  const [mounted, setMounted] = useState(false);
+-  const [pageSearchQuery, setPageSearchQuery] = useState('');
++const [mounted, setMounted] = useState(false);
++  const [deletedAccountInfo, setDeletedAccountInfo] = useState<{ daysRemaining: number } | null>(null);  const [pageSearchQuery, setPageSearchQuery] = useState('');
+   const [hasNoMatches, setHasNoMatches] = useState(false);
+   const searchInputRef = React.useRef<HTMLInputElement>(null);
+ 
+@@ -56,11 +56,20 @@ export default function DashboardLayout({
+     if (!clerkLoaded) return;
+ 
+     const hydrateUser = async () => {
+-      try {
++try {
+         const dbProfile = await getCurrentUserProfile();
+ 
+-        // Build Clerk identity fields ΓÇö always real, always available once loaded
+-        const clerkIdentity = clerkUser
++        // If this account was soft-deleted, show the recovery prompt instead
++        // of hydrating the dashboard ΓÇö the user must choose to restore or not.
++        if (dbProfile?.deletedAt) {
++          const deletedAt = new Date(dbProfile.deletedAt);
++          const daysSince = (Date.now() - deletedAt.getTime()) / (1000 * 60 * 60 * 24);
++          const daysRemaining = Math.max(0, Math.ceil(30 - daysSince));
++          setDeletedAccountInfo({ daysRemaining });
++          return;
++        }
++
++        // Build Clerk identity fields ΓÇö always real, always available once loaded        const clerkIdentity = clerkUser
+           ? {
+               fullName:
+                 clerkUser.fullName ||
+@@ -246,9 +255,22 @@ export default function DashboardLayout({
+         backgroundColor: 'var(--background)',
+         color: 'var(--foreground)',
+       }}
+-    >
+-      {/* Dynamic Background glowing canvas */}
+-      <div className='absolute top-[20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none' />
++>
++      {/* Soft-deleted account recovery prompt ΓÇö blocks the dashboard until resolved */}
++      {deletedAccountInfo && (
++        <AccountRecoveryPrompt
++          daysRemaining={deletedAccountInfo.daysRemaining}
++          onRestored={() => {
++            setDeletedAccountInfo(null);
++            window.location.reload();
++          }}
++          onDismiss={async () => {
++            await signOut({ redirectUrl: '/' });
++          }}
++        />
++      )}
++
++      {/* Dynamic Background glowing canvas */}      <div className='absolute top-[20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none' />
+       <div className='absolute bottom-[20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-[120px] pointer-events-none' />
+ 
+       {/* Desktop Sidebar (Left Panel) */}
+diff --git a/app/dashboard/settings/page.tsx b/app/dashboard/settings/page.tsx
+index 96ea2ce..1071ac4 100644
+--- a/app/dashboard/settings/page.tsx
++++ b/app/dashboard/settings/page.tsx
+@@ -33,21 +33,26 @@ import { Button } from '@/components/ui/Button';
+ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
+ import { Input } from '@/components/ui/Input';
+ import type { Theme } from '@/lib/ThemeProvider';
++import { useRouter } from 'next/navigation';
++import { useClerk } from '@clerk/nextjs';
+ import { useAppStore } from '@/store/useAppStore';
+ import { useTheme } from '@/lib/ThemeProvider';
+ import { 
+   getProfessionalLinks, 
+   updateProfessionalLinks, 
+   updateUserSkillsInDb, 
+-  updateProfileAvatar 
+-} from '@/app/actions/user';
+-import { extractSkillsFromResume } from '@/app/actions/extractSkills';
++  updateProfileAvatar,
++  softDeleteAccount
++} from '@/app/actions/user';import { extractSkillsFromResume } from '@/app/actions/extractSkills';
+ import { toast } from 'sonner'; 
+ 
+ export default function SettingsPage() {
++  const router = useRouter();
++  const { signOut } = useClerk();
++  const [isDeleting, setIsDeleting] = useState(false);
++
+   const { 
+-    user, 
+-    onboardingData, 
++    user,    onboardingData, 
+     updateProfile, 
+     updateAvatar, 
+     updatePortfolioVisibility, 
+@@ -299,12 +304,31 @@ export default function SettingsPage() {
+     }
+   };
+ 
+-  // Reset Onboarding pathway
++// Reset Onboarding pathway
+   const handleResetOnboarding = () => {
+     resetOnboarding();
+     toast.success("Onboarding reset successfully.");
+   };
+ 
++  // Soft-delete account ΓÇö flags the record instead of wiping it,
++  // giving the user 30 days to log back in and recover it.
++  const handleDeleteAccount = async () => {
++    const confirmed = window.confirm(
++      "Are you sure you want to delete your account? You'll have 30 days to log back in and restore it before it's permanently erased."
++    );
++    if (!confirmed) return;
++
++    setIsDeleting(true);
++    try {
++      await softDeleteAccount();
++      toast.success("Account scheduled for deletion. Log back in within 30 days to restore it.");
++      await signOut({ redirectUrl: "/" });
++    } catch (error) {
++      console.error("Failed to delete account:", error);
++      toast.error("Something went wrong while deleting your account.");
++      setIsDeleting(false);
++    }
++  };
+   const [gitUsername, setGitUsername] = useState(githubAnalytics.username || '');
+   const [gitLoading, setGitLoading] = useState(false);
+ 
+@@ -981,15 +1005,16 @@ export default function SettingsPage() {
+                 </div>
+               </div>
+ 
+-              {/* Delete Account */}
++{/* Delete Account */}
+               <Button
+                 variant="outline"
++                onClick={handleDeleteAccount}
++                disabled={isDeleting}
+                 className="w-full h-11 border-rose-500/20 hover:bg-rose-500/10 text-rose-400 hover:text-white text-xs font-semibold"
+-                leftIcon={<Trash2 className="w-4 h-4 shrink-0" />}
++                leftIcon={isDeleting ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" /> : <Trash2 className="w-4 h-4 shrink-0" />}
+               >
+-                Delete Account & Cockpit
++                {isDeleting ? "Deleting..." : "Delete Account & Cockpit"}
+               </Button>
+-
+             </CardContent>
+           </Card>
+ 
+diff --git a/components/dashboard/AccountRecoveryPrompt.tsx b/components/dashboard/AccountRecoveryPrompt.tsx
+new file mode 100644
+index 0000000..60fabdd
+--- /dev/null
++++ b/components/dashboard/AccountRecoveryPrompt.tsx
+@@ -0,0 +1,69 @@
++'use client';
++
++import React, { useState } from 'react';
++import { motion } from 'framer-motion';
++import { RotateCcw, AlertTriangle } from 'lucide-react';
++import { Button } from '@/components/ui/Button';
++import { restoreAccount } from '@/app/actions/user';
++import { toast } from 'sonner';
++
++interface AccountRecoveryPromptProps {
++  daysRemaining: number;
++  onRestored: () => void;
++  onDismiss: () => void;
++}
++
++export function AccountRecoveryPrompt({ daysRemaining, onRestored, onDismiss }: AccountRecoveryPromptProps) {
++  const [isRestoring, setIsRestoring] = useState(false);
++
++  const handleRestore = async () => {
++    setIsRestoring(true);
++    try {
++      await restoreAccount();
++      toast.success('Welcome back! Your account has been restored.');
++      onRestored();
++    } catch (error) {
++      console.error('Failed to restore account:', error);
++      toast.error('Something went wrong restoring your account.');
++      setIsRestoring(false);
++    }
++  };
++
++  return (
++    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-6">
++      <motion.div
++        initial={{ opacity: 0, scale: 0.95 }}
++        animate={{ opacity: 1, scale: 1 }}
++        className="max-w-md w-full p-8 rounded-2xl border border-white/10 bg-[#0a071a] text-center space-y-4 shadow-2xl"
++      >
++        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400">
++          <AlertTriangle className="w-8 h-8" />
++        </div>
++        <h2 className="text-xl font-bold text-white">Restore Your Account?</h2>
++        <p className="text-xs text-slate-400 leading-relaxed">
++          Your account is scheduled for permanent deletion in {daysRemaining} day{daysRemaining === 1 ? '' : 's'}.
++          Would you like to cancel the deletion and restore it?
++        </p>
++        <div className="flex flex-col gap-2 pt-2">
++          <Button
++            variant="premium"
++            className="w-full h-10 text-xs font-semibold"
++            onClick={handleRestore}
++            disabled={isRestoring}
++          >
++            <RotateCcw className="w-4 h-4 mr-2" />
++            {isRestoring ? 'Restoring...' : 'Restore My Account'}
++          </Button>
++          <Button
++            variant="outline"
++            className="w-full h-10 text-xs font-semibold"
++            onClick={onDismiss}
++            disabled={isRestoring}
++          >
++            Keep It Deleted
++          </Button>
++        </div>
++      </motion.div>
++    </div>
++  );
++}
+\ No newline at end of file
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+index 5293458..8668e1f 100644
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -20,9 +20,9 @@ model User {
+   resumeUrl           String?
+   dailyStudyTime      Int?
+   onboardingCompleted Boolean        @default(false)
+-  portfolioPublic     Boolean        @default(false)
+-  projects            Project[]
+-  notifications       Notification[]
++portfolioPublic     Boolean        @default(false)
++  deletedAt           DateTime?
++  projects            Project[]  notifications       Notification[]
+   activities          Activity[]
+   createdAt           DateTime       @default(now())
+   updatedAt           DateTime       @updatedAt

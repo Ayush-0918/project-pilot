@@ -4,7 +4,7 @@ import {
   BarChartSkeleton,
   RadarChartSkeleton,
 } from "@/components/charts/ChartSkeleton";
-import { ActivityTimeline } from "@/components/projects/ActivityTimeline";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 import { Badge } from "@/components/ui/Badge";
 import { Github } from "@/components/ui/BrandIcons";
 import { Button } from "@/components/ui/Button";
@@ -760,13 +760,7 @@ export default function MainDashboardPage() {
       {/* Project Activity Timeline */}
       <Card hoverEffect={false} className="bg-[#08051e]/40">
         <CardContent className="pt-6">
-          <ActivityTimeline
-            activities={activities}
-            limit={6}
-            showProjectName
-            title="Recent updates"
-            description="The latest milestones and blueprint changes across your projects."
-          />
+          <ActivityFeed />
         </CardContent>
       </Card>
     </div>

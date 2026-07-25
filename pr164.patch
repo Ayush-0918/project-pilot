@@ -1,0 +1,193 @@
+From 8dda4669eee20af44409126a7f53cf8dd4a9df0b Mon Sep 17 00:00:00 2001
+From: Revati Kadam <revatikadam0607@gmail.com>
+Date: Fri, 24 Jul 2026 22:38:20 +0530
+Subject: [PATCH] translate AI
+
+---
+ app/api/chat/route.ts         | 18 ++++++++---
+ app/dashboard/mentor/page.tsx | 59 ++++++++++++++++++++++++++++++++---
+ store/slices/chatSlice.ts     | 14 ++++++---
+ 3 files changed, 77 insertions(+), 14 deletions(-)
+
+diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts
+index 7087827..77d2f48 100644
+--- a/app/api/chat/route.ts
++++ b/app/api/chat/route.ts
+@@ -6,8 +6,13 @@ export const maxDuration = 30;
+ 
+ export async function POST(req: Request) {
+   try {
+-    const { messages, userContext, isRoastMode, isMockInterview, endInterview } = await req.json();
+-
++const {
++              messages,
++              userContext,
++              isRoastMode,
++              isMockInterview,
++              endInterview,
++              translateLanguage, } = await req.json();
+     // Resilient simulated streaming fallback mode when API key is unconfigured
+     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+       const lastMessage = messages[messages.length - 1]?.content || 'Hello';
+@@ -124,8 +129,13 @@ Hiring Recommendation:`
+ }`;
+     }
+ 
+-    // Gemini strictly requires the first message to be from the user.
+-    const validMessages = [...messages];
++// If the user picked a translate language, append instructions so every
++    // future response is written in that language, except code stays in English.
++    if (translateLanguage) {
++      systemPrompt += `\n\nIMPORTANT LANGUAGE INSTRUCTION: You are an expert AI mentor. Please provide all responses in conversational ${translateLanguage}, while keeping code blocks, variable names, and syntax in standard English.`;
++    }
++
++    // Gemini strictly requires the first message to be from the user.    const validMessages = [...messages];
+     while (validMessages.length > 0 && validMessages[0].role === 'assistant') {
+       validMessages.shift();
+     }
+diff --git a/app/dashboard/mentor/page.tsx b/app/dashboard/mentor/page.tsx
+index a50c889..449b01f 100644
+--- a/app/dashboard/mentor/page.tsx
++++ b/app/dashboard/mentor/page.tsx
+@@ -15,8 +15,9 @@ import {
+   CheckCircle,
+   FileText,
+   User as UserIcon,
+-  Compass,
+-  X,
++Compass,
++  Languages,
++  ChevronDown,  X,
+   Maximize2,
+   Minimize2,
+   Flame,
+@@ -43,10 +44,13 @@ export default function AiMentorChatPage() {
+     setReadingMode,
+     isRoastMode,
+     toggleRoastMode,
+-    isMockInterview,
+-    toggleMockInterview
++isMockInterview,
++    toggleMockInterview,
++    translateLanguage,
++    setTranslateLanguage
+   } = useAppStore();
+ 
++  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+   const [inputMessage, setInputMessage] = useState('');
+   const [copiedCodeIdx, setCopiedCodeIdx] = useState<string | null>(null);
+   const [attachment, setAttachment] = useState<{ name: string; size: string } | null>(null);
+@@ -371,12 +375,57 @@ export default function AiMentorChatPage() {
+               <span>{isMockInterview ? 'MOCK INTERVIEW ON' : 'MOCK INTERVIEW'}</span>
+             </button>
+ 
++<div className="relative">
++              <button
++                type="button"
++                onClick={() => setIsLangMenuOpen((prev) => !prev)}
++                title="Translate AI responses"
++                className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-wider transition-all transform active:scale-95 border cursor-pointer ${
++                  translateLanguage
++                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
++                    : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300'
++                }`}
++              >
++                <Languages className="w-3.5 h-3.5" />
++                <span>{translateLanguage ? translateLanguage.toUpperCase() : 'TRANSLATE'}</span>
++                <ChevronDown className="w-3 h-3" />
++              </button>
++
++              {isLangMenuOpen && (
++                <div
++                  className="absolute right-0 mt-2 w-40 rounded-xl border border-white/10 bg-[#0a071a] shadow-2xl overflow-hidden z-20"
++                  onMouseLeave={() => setIsLangMenuOpen(false)}
++                >
++                  {[
++                    { label: 'English (Off)', value: null },
++                    { label: 'Telugu', value: 'Telugu' },
++                    { label: 'Hindi', value: 'Hindi' },
++                  ].map((option) => (
++                    <button
++                      key={option.label}
++                      type="button"
++                      onClick={() => {
++                        setTranslateLanguage(option.value);
++                        setIsLangMenuOpen(false);
++                      }}
++                      className={`w-full text-left px-3.5 py-2 text-xs transition-colors cursor-pointer ${
++                        translateLanguage === option.value
++                          ? 'bg-emerald-500/10 text-emerald-300 font-semibold'
++                          : 'text-slate-300 hover:bg-white/5'
++                      }`}
++                    >
++                      {option.label}
++                    </button>
++                  ))}
++                </div>
++              )}
++            </div>
++
+             <Badge variant="glow" className="text-[10px] font-mono">
+               ONLINE
+             </Badge>
+           </div>
+         </div>
+-
+         {/* Scrollable messages container */}
+         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+           {activeConv?.messages.map((msg) => {
+diff --git a/store/slices/chatSlice.ts b/store/slices/chatSlice.ts
+index c92c34c..f023b2f 100644
+--- a/store/slices/chatSlice.ts
++++ b/store/slices/chatSlice.ts
+@@ -19,10 +19,12 @@ export interface ChatSlice {
+   toggleMockInterview: () => void;
+   setMockInterview: (enabled: boolean) => void;
+ 
+-  isReadingMode: boolean;
++isReadingMode: boolean;
+   activeReadingMessageId: string | null;
+   setReadingMode: (isReadingMode: boolean, activeReadingMessageId?: string | null) => void;
+ 
++  translateLanguage: string | null;
++  setTranslateLanguage: (language: string | null) => void;
+   sendMessage: (
+   content: string,
+   codeSnippet?: {
+@@ -77,11 +79,13 @@ export const createChatSlice =
+     isRoastMode: enabled ? false : state.isRoastMode
+   })),
+ 
+-  isReadingMode: false,
++isReadingMode: false,
+   activeReadingMessageId: null,
+   setReadingMode: (isReadingMode, activeReadingMessageId = null) =>
+     set({ isReadingMode, activeReadingMessageId }),
+ 
++  translateLanguage: null,
++  setTranslateLanguage: (language) => set({ translateLanguage: language }),
+   sendMessage: (content, codeSnippet, attachments, options) =>
+     set((state) => {
+ 
+@@ -155,7 +159,7 @@ export const createChatSlice =
+             content:m.content
+           }));
+ 
+-          const response=await fetch("/api/chat",{
++const response=await fetch("/api/chat",{
+             method:"POST",
+             headers:{
+               "Content-Type":"application/json"
+@@ -165,10 +169,10 @@ export const createChatSlice =
+               userContext:get().user||DEFAULT_USER,
+               isRoastMode,
+               isMockInterview,
+-              endInterview
++              endInterview,
++              translateLanguage:get().translateLanguage
+             })
+           });
+-
+           if(response.status===429){
+             throw new Error("RATE_LIMIT_EXCEEDED");
+           }
