@@ -1,5 +1,8 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -37,7 +40,21 @@ export async function GET(req: Request) {
 // POST: Handle chat streaming, context injection, and database persistence
 export async function POST(req: Request) {
   try {
+    const { userId: clerkId } = await auth();
+    let dbUserId: string | undefined = undefined;
+
+    if (clerkId) {
+      const user = await prisma.user.findUnique({
+        where: { clerkId },
+        select: { id: true },
+      });
+      if (user) {
+        dbUserId = user.id;
+      }
+    }
+
     const { messages, userContext, isRoastMode, isMockInterview, endInterview } = await req.json();
+    const latestUserMessage = messages[messages.length - 1];
 
     // Resilient simulated streaming fallback mode when API key is unconfigured
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
@@ -80,7 +97,7 @@ Let me know if you would like a code snippet or a step-by-step roadmap for this 
             role: 'assistant',
             content: mockText,
           },
-        }).catch((err) => console.error('Failed to save assistant mock message:', err));
+        }).catch((err: unknown) => console.error('Failed to save assistant mock message:', err));
       }
 
       const textEncoder = new TextEncoder();
@@ -186,7 +203,7 @@ Hiring Recommendation:`
               role: 'assistant',
               content: text,
             },
-          }).catch((err) => console.error('Failed to save assistant response:', err));
+          }).catch((err: unknown) => console.error('Failed to save assistant response:', err));
         }
       },
     });
