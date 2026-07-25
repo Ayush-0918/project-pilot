@@ -62,10 +62,7 @@ export async function POST(req: Request) {
         dbUserId = user.id;
       }
     }
-
-    const { messages, userContext, isRoastMode, isMockInterview, endInterview } = await req.json();
     const latestUserMessage = messages[messages.length - 1];
-
 
     // Resilient simulated streaming fallback mode when API key is unconfigured
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
