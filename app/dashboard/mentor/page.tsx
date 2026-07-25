@@ -51,6 +51,11 @@ export default function AiMentorChatPage() {
   const [copiedCodeIdx, setCopiedCodeIdx] = useState<string | null>(null);
   const [attachment, setAttachment] = useState<{ name: string; size: string } | null>(null);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -658,7 +663,7 @@ export default function AiMentorChatPage() {
                 <Paperclip className="w-4 h-4" aria-hidden="true" />
               </button>
 
-              {speechSupported && (
+              {mounted && speechSupported && (
                 <button
                   type="button"
                   onClick={isListening ? stopListening : startListening}
