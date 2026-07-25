@@ -248,6 +248,38 @@ export async function toggleProjectMilestoneInDb(projectId: string, stepId: stri
 }
 
 /**
+ * Reorders the steps/milestones in a project's roadmap and persists the new order.
+ */
+export async function reorderProjectMilestonesInDb(projectId: string, steps: any[]) {
+  try {
+    const clerkId = await getAuthenticatedUserId();
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId }
+    });
+
+    if (!dbUser) {
+      throw new Error('User record not found.');
+    }
+
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { roadmap: steps }
+    });
+
+    return { success: true as const };
+  } catch (error) {
+    console.error('Failed to reorder project milestones in database:', error);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Postgres offline. Bypassing reorderProjectMilestonesInDb in offline-mode.');
+      return { success: false as const };
+    }
+    throw error;
+  }
+}
+
+/**
  * Logs a new activity entry in the database.
  */
 export async function createActivityInDb(projectId: string, description: string, type: string = 'milestone') {
