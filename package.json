@@ -43,6 +43,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.2.13",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/dom-speech-recognition": "^0.0.12",

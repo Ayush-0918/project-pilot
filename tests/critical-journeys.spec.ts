@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { setupClerkTestingToken } from '@clerk/testing/playwright';
 
 test.describe('ProjectPilot Critical User Journeys', () => {
   test('should successfully load dashboard and create a new project', async ({ page }) => {
+    await setupClerkTestingToken({ page });
+    
     await page.goto('/dashboard/projects');
     await expect(page.locator('text=Recommended Project blue-prints')).toBeVisible();
 
