@@ -4,6 +4,7 @@ import {
   toggleProjectMilestoneInDb,
   createActivityInDb,
   saveProjectToDb,
+  reorderProjectMilestonesInDb,
 } from "@/app/actions/projectActions";
 import { toast } from "sonner";
 
@@ -26,6 +27,7 @@ export interface ProjectSlice {
     stepId: string,
     taskIndex: number
   ) => void;
+  reorderSteps: (projectId: string, fromIndex: number, toIndex: number) => void;
 
   initializeRoadmap: (projectId: string, title: string) => void;
 }
@@ -178,6 +180,28 @@ export const createProjectSlice = (
   },
 
   toggleTaskCompletion: () => set(() => ({})),
+
+  reorderSteps: (projectId, fromIndex, toIndex) =>
+    set((state: ProjectSlice) => {
+      const roadmap = state.roadmaps[projectId];
+      if (!roadmap) return {};
+
+      const updatedSteps = [...roadmap.steps];
+      const [movedStep] = updatedSteps.splice(fromIndex, 1);
+      updatedSteps.splice(toIndex, 0, movedStep);
+
+      reorderProjectMilestonesInDb(projectId, updatedSteps);
+
+      return {
+        roadmaps: {
+          ...state.roadmaps,
+          [projectId]: {
+            ...roadmap,
+            steps: updatedSteps,
+          },
+        },
+      };
+    }),
 
   initializeRoadmap: (projectId, title) =>
     set((state: ProjectSlice) => {
