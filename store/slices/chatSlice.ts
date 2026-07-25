@@ -19,7 +19,7 @@ export interface ChatSlice {
   toggleMockInterview: () => void;
   setMockInterview: (enabled: boolean) => void;
 
-isReadingMode: boolean;
+  isReadingMode: boolean;
   activeReadingMessageId: string | null;
   setReadingMode: (isReadingMode: boolean, activeReadingMessageId?: string | null) => void;
 
@@ -79,7 +79,7 @@ export const createChatSlice =
     isRoastMode: enabled ? false : state.isRoastMode
   })),
 
-isReadingMode: false,
+  isReadingMode: false,
   activeReadingMessageId: null,
   setReadingMode: (isReadingMode, activeReadingMessageId = null) =>
     set({ isReadingMode, activeReadingMessageId }),
@@ -159,7 +159,7 @@ isReadingMode: false,
             content:m.content
           }));
 
-const response=await fetch("/api/chat",{
+          const response=await fetch("/api/chat",{
             method:"POST",
             headers:{
               "Content-Type":"application/json"

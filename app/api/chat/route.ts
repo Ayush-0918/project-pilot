@@ -41,13 +41,14 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
 
-const {
-              messages,
-              userContext,
-              isRoastMode,
-              isMockInterview,
-              endInterview,
-              translateLanguage, } = await req.json();
+    const {
+      messages,
+      userContext,
+      isRoastMode,
+      isMockInterview,
+      endInterview,
+      translateLanguage,
+    } = await req.json();
 
     const { userId: clerkId } = await auth();
     let dbUserId: string | undefined = undefined;
@@ -193,13 +194,14 @@ Hiring Recommendation:`
 }`;
     }
 
-// If the user picked a translate language, append instructions so every
+    // If the user picked a translate language, append instructions so every
     // future response is written in that language, except code stays in English.
     if (translateLanguage) {
       systemPrompt += `\n\nIMPORTANT LANGUAGE INSTRUCTION: You are an expert AI mentor. Please provide all responses in conversational ${translateLanguage}, while keeping code blocks, variable names, and syntax in standard English.`;
     }
 
-    // Gemini strictly requires the first message to be from the user.    const validMessages = [...messages];
+    // Gemini strictly requires the first message to be from the user.
+    const validMessages = [...messages];
     while (validMessages.length > 0 && validMessages[0].role === 'assistant') {
       validMessages.shift();
     }

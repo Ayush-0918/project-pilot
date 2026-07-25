@@ -15,9 +15,10 @@ import {
   CheckCircle,
   FileText,
   User as UserIcon,
-Compass,
+  Compass,
   Languages,
-  ChevronDown,  X,
+  ChevronDown,
+  X,
   Maximize2,
   Minimize2,
   Flame,
@@ -489,10 +490,7 @@ isMockInterview,
               )}
             </div>
 
-            <Badge variant="glow" className="text-[10px] font-mono">
-
             <Badge variant="glow" className="hidden sm:inline-flex text-[10px] font-mono">
-
               ONLINE
             </Badge>
           </div>
