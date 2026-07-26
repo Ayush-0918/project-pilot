@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -26,6 +27,38 @@ import { Badge } from '@/components/ui/Badge';
 
 export default function MarketingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'ProjectPilot AI',
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'Web',
+    description:
+      'Your intelligent career co-pilot that scans your resume and GitHub, identifies skill gaps, and recommends professional-grade project roadmaps with dedicated AI mentors.',
+    url: 'https://projectpilot.ai',
+    offers: [
+      {
+        '@type': 'Offer',
+        price: '19',
+        priceCurrency: 'USD',
+        description: 'Professional Guide monthly subscription',
+      },
+    ],
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } }
+  };
 
   const workflowSteps = [
     {
@@ -103,6 +136,12 @@ export default function MarketingPage() {
   ];
 
   return (
+    <>
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     /*
      * Root wrapper — uses CSS custom property vars so the entire page flips
      * correctly in both dark and light themes. No hardcoded hex colours.
@@ -617,9 +656,20 @@ borderColor:"rgba(var(--color-primary-rgb),0.35)"
                   </ul>
                 </CardContent>
                 <CardFooter className="pt-2">
-                  <Link href="/onboarding" className="w-full">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/stripe/checkout', { method: 'POST' });
+                        const data = await res.json();
+                        if (data.url) window.location.href = data.url;
+                      } catch {
+                        window.location.href = '/onboarding';
+                      }
+                    }}
+                    className="w-full"
+                  >
                     <Button variant="premium" className="w-full">Get Premium Access</Button>
-                  </Link>
+                  </button>
                 </CardFooter>
               </Card>
 
@@ -775,5 +825,6 @@ e.currentTarget.style.color="var(--text-secondary)"
         </div>
       </footer>
     </div>
+    </>
   );
 }

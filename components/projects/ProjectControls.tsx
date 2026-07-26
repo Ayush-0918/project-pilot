@@ -1,7 +1,7 @@
 'use client';
 
-import { Grid2X2, List, RotateCcw, Search } from 'lucide-react';
-
+import Tooltip from '@/components/ui/Tooltip';
+import { Grid2X2, Info, List, RotateCcw, Search } from 'lucide-react';
 export type ProjectStatusFilter = 'All' | 'Planned' | 'In Progress' | 'Completed' | 'Archived';
 export type ProjectSort = 'recent' | 'oldest' | 'name-asc' | 'name-desc' | 'progress';
 export type ProjectView = 'grid' | 'list';
@@ -48,6 +48,17 @@ export function ProjectControls({
       aria-label="Project filters and sorting"
       className="glass-panel space-y-4 rounded-2xl bg-[#08051e]/40 p-4"
     >
+       <div className="flex items-center gap-2">
+        <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          Filter &amp; sort
+        </span>
+        <Tooltip content="Search, filter by status, and sort your projects. Use the toggle to switch between grid and list view.">
+          <Info
+            className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors"
+            aria-label="Project controls information"
+          />
+        </Tooltip>
+      </div>
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
         <label className="relative block min-w-0 flex-1" htmlFor="project-search">
           <span className="sr-only">Search projects</span>

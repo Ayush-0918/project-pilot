@@ -6,9 +6,10 @@ import React from 'react';
 type TooltipProps = {
   content: string;
   children: React.ReactNode;
+  side?: 'top' | 'right' | 'bottom' | 'left';
 };
 
-export default function Tooltip({ content, children }: TooltipProps) {
+export default function Tooltip({ content, children, side = 'top' }: TooltipProps) {
   return (
     <TooltipPrimitive.Provider>
       <TooltipPrimitive.Root>
@@ -18,7 +19,7 @@ export default function Tooltip({ content, children }: TooltipProps) {
 
         <TooltipPrimitive.Portal>
           <TooltipPrimitive.Content
-            side="top"
+            side={side}
             sideOffset={8}
             className="z-50 max-w-xs rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white shadow-lg"
           >

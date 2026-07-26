@@ -12,14 +12,14 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
+import Tooltip from "@/components/ui/Tooltip";
 import { useAppStore } from "@/store/useAppStore";
 import {
   Activity,
   AlertTriangle,
   Award,
   CheckCircle,
-  ChevronRight,
-  Sparkles
+  ChevronRight, Info, Sparkles
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -109,8 +109,14 @@ export default function CareerScorePage() {
                 Aggregated matching rating
               </span>
             </div>
-            <CardTitle className="text-base font-bold">
-              Overall Career Readiness Score
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <span>Overall Career Readiness Score</span>
+              <Tooltip content="Calculated from your resume keyword match, GitHub activity, and completed roadmap milestones, weighted against real-world requirements for your target role.">
+                <Info
+                  className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors"
+                  aria-label="Career readiness score information"
+                />
+              </Tooltip>
             </CardTitle>
             <CardDescription className="text-xs">
               Based on connected resume keyword matching, GitHub profile crawl,
@@ -124,8 +130,14 @@ export default function CareerScorePage() {
               <span className="text-5xl font-black text-white relative z-10">
                 {careerScore.overallScore}%
               </span>
-              <span className="text-[10px] text-slate-400 font-mono mt-1 relative z-10 uppercase tracking-widest">
+              <span className="text-[10px] text-slate-400 font-mono mt-1 relative z-10 uppercase tracking-widest flex items-center justify-center gap-1">
                 Match rate
+                <Tooltip content="The percentage overlap between your current profile and the skills, experience, and keywords typically required for your target role.">
+                  <Info
+                    className="h-3 w-3 cursor-help text-slate-500 hover:text-indigo-400 transition-colors"
+                    aria-label="Match rate information"
+                  />
+                </Tooltip>
               </span>
             </div>
 
@@ -146,8 +158,14 @@ export default function CareerScorePage() {
           className="bg-[#08051e]/40 flex flex-col justify-between"
         >
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold">
-              Category Readiness Gauges
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <span>Category Readiness Gauges</span>
+              <Tooltip content="Each gauge reflects how much of your detected skill set covers what's typically expected for that area of full-stack development.">
+                <Info
+                  className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors"
+                  aria-label="Category readiness gauges information"
+                />
+              </Tooltip>
             </CardTitle>
             <CardDescription className="text-xs">
               Individual matching rates across standard full-stack areas.
@@ -198,7 +216,15 @@ export default function CareerScorePage() {
             <div className="h-px bg-white/5 my-3" />
 
             <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono uppercase tracking-wider">
-              <span>Resume score rating</span>
+              <span className="flex items-center gap-1">
+                Resume score rating
+                <Tooltip content="How closely your uploaded resume's keywords and structure match what recruiters and ATS systems look for in your target role.">
+                  <Info
+                    className="h-3 w-3 cursor-help text-slate-500 hover:text-indigo-400 transition-colors"
+                    aria-label="Resume score rating information"
+                  />
+                </Tooltip>
+              </span>
               <span>{careerScore.resumeScore}% Matches</span>
             </div>
           </CardContent>
@@ -215,6 +241,12 @@ export default function CareerScorePage() {
               <span className="text-[10px] font-bold uppercase tracking-wider font-mono">
                 Profile scanning discrepancies
               </span>
+              <Tooltip content="Skills flagged as missing by comparing your detected profile against the typical requirements for your target role.">
+                <Info
+                  className="h-3 w-3 cursor-help text-rose-400/70 hover:text-rose-300 transition-colors"
+                  aria-label="Profile scanning discrepancies information"
+                />
+              </Tooltip>
             </div>
             <CardTitle className="text-base font-bold">
               Detected Missing Skills & Gaps
@@ -263,6 +295,12 @@ export default function CareerScorePage() {
               <span className="text-[10px] font-bold uppercase tracking-wider font-mono">
                 Action recommendation blueprint
               </span>
+              <Tooltip content="Suggested next steps generated by comparing your detected skill gaps against your target role, prioritized by impact.">
+                <Info
+                  className="h-3 w-3 cursor-help text-indigo-400/70 hover:text-indigo-300 transition-colors"
+                  aria-label="Action recommendation blueprint information"
+                />
+              </Tooltip>
             </div>
             <CardTitle className="text-base font-bold">
               AI Improvement Pathways

@@ -1,65 +1,63 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { extractSkillsFromResume } from '@/app/actions/extractSkills';
 import {
-  Settings,
-  User as UserIcon,
-  Bell,
-  Eye,
-  Sparkles,
-  Trash2,
-  RefreshCw,
-  CheckCircle,
-  Sun,
-  Moon,
-  Monitor,
-  AlertCircle,
-  Camera,
-  Loader2,
-  Plus,
-  X,
-  Globe,
-  Copy,
-  ExternalLink,
-  Check,
-  Download,
-  Upload
-} from 'lucide-react';
+  getProfessionalLinks,
+  updateProfessionalLinks,
+  updateProfileAvatar,
+  updateUserSkillsInDb
+} from '@/app/actions/user';
 import { Badge } from '@/components/ui/Badge';
 import { Github, Linkedin } from '@/components/ui/BrandIcons';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import Tooltip from '@/components/ui/Tooltip';
 import type { Theme } from '@/lib/ThemeProvider';
-import { useAppStore } from '@/store/useAppStore';
 import { useTheme } from '@/lib/ThemeProvider';
-import { 
-  getProfessionalLinks, 
-  updateProfessionalLinks, 
-  updateUserSkillsInDb, 
-  updateProfileAvatar 
-} from '@/app/actions/user';
-import { extractSkillsFromResume } from '@/app/actions/extractSkills';
-import { toast } from 'sonner'; 
+import { useAppStore } from '@/store/useAppStore';
 import {
   ACCENT_THEMES,
   AccentTheme,
-} from "@/store/slices/themeSlice";
+} from '@/store/slices/themeSlice';
+import {
+  AlertCircle,
+  Camera,
+  Check,
+  CheckCircle,
+  Copy,
+  Download,
+  ExternalLink,
+  Globe,
+  Info,
+  Loader2,
+  Moon,
+  Plus,
+  RefreshCw,
+  Settings,
+  Sparkles,
+  Sun,
+  Trash2,
+  Upload,
+  User as UserIcon,
+  X,
+} from 'lucide-react';
+import Image from 'next/image';
+import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
-  const { 
-    user, 
-    onboardingData, 
-    updateProfile, 
-    updateAvatar, 
-    updatePortfolioVisibility, 
-    resetOnboarding, 
-    githubAnalytics, 
-    connectGithub, 
-    disconnectGithub, 
-    updateUserSkills, 
+  const {
+    user,
+    onboardingData,
+    updateProfile,
+    updateAvatar,
+    updatePortfolioVisibility,
+    resetOnboarding,
+    githubAnalytics,
+    connectGithub,
+    disconnectGithub,
+    updateUserSkills,
     updateProfessionalLinks: updateLinksStore,
     accentTheme,
     setAccentTheme,
@@ -79,17 +77,17 @@ export default function SettingsPage() {
   const [linksLoading, setLinksLoading] = useState(false);
   const [linksSuccess, setLinksSuccess] = useState(false);
   const [linksError, setLinksError] = useState('');
-  
+
   useEffect(() => {
-    async function loadLinks(){
+    async function loadLinks() {
       try {
         const data = await getProfessionalLinks();
-        if(!data) return;
+        if (!data) return;
 
         setGithubUrl(data.githubUrl || "");
         setLinkedinUrl(data.linkedinUrl || "");
         setResumeUrl(data.resumeUrl || "");
-      } catch(err) {
+      } catch (err) {
         console.error(err);
       }
     }
@@ -115,7 +113,7 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ portfolioPublic: nextState, username: customHandle }),
       });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleSaveHandle = async () => {
@@ -126,7 +124,7 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ portfolioPublic: isPortfolioPublic, username: customHandle }),
       });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleCopyPortfolioUrl = () => {
@@ -211,7 +209,7 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>((user as any)?.imageUrl || null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const isUploading = false; 
+  const isUploading = false;
 
   const handleSaveAvatar = async () => {
     if (!previewUrl) return;
@@ -324,7 +322,7 @@ export default function SettingsPage() {
     try {
       const response = await fetch('/api/settings/export');
       if (!response.ok) throw new Error('Export failed');
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -356,7 +354,7 @@ export default function SettingsPage() {
       });
 
       if (!response.ok) throw new Error('Import failed');
-      
+
       window.location.reload();
     } catch (e) {
       console.error(e);
@@ -445,7 +443,7 @@ export default function SettingsPage() {
                   ) : (
                     <UserIcon className="w-8 h-8 text-slate-500" />
                   )}
-                  <button 
+                  <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
@@ -458,21 +456,21 @@ export default function SettingsPage() {
                 <div className="space-y-2 w-full flex-1">
                   <h4 className="font-bold text-slate-200">Profile Image</h4>
                   <p className="text-[11px] text-slate-400 leading-relaxed">Update your public avatar image. JPG, PNG, or WEBP up to 5MB.</p>
-                  
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
                     accept=".jpg,.jpeg,.png,.webp"
                     onChange={handleAvatarSelection}
                     disabled={isUploading}
                   />
 
                   <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <Button 
+                    <Button
                       type="button"
-                      variant="outline" 
-                      size="sm" 
+                      variant="outline"
+                      size="sm"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
                       className="h-8 text-[11px] border-white/10 text-slate-300 hover:text-white"
@@ -502,7 +500,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-              
+
               <form onSubmit={handleSaveProfile} className="space-y-4 pt-1">
                 <Input
                   id="settings-name"
@@ -546,14 +544,12 @@ export default function SettingsPage() {
                       role="switch"
                       aria-checked={isPortfolioPublic}
                       onClick={handleTogglePortfolioPublic}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                        isPortfolioPublic ? 'bg-indigo-600' : 'bg-slate-700'
-                      }`}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isPortfolioPublic ? 'bg-indigo-600' : 'bg-slate-700'
+                        }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                          isPortfolioPublic ? 'translate-x-5' : 'translate-x-0'
-                        }`}
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${isPortfolioPublic ? 'translate-x-5' : 'translate-x-0'
+                          }`}
                       />
                     </button>
                   </div>
@@ -652,6 +648,9 @@ export default function SettingsPage() {
                 <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
                   AI Automated
                 </span>
+                <Tooltip content="Skills you add here directly affect your Career Readiness Score and the project recommendations you receive. The AI extractor scans pasted resume text for recognizable technical skills.">
+                  <Info className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Skills portfolio information" />
+                </Tooltip>
               </CardTitle>
               <CardDescription className="text-xs">
                 Manage your technical skills or paste your resume text to extract skills automatically using AI.
@@ -667,15 +666,15 @@ export default function SettingsPage() {
                     <span className="text-xs text-slate-500 italic">No skills added yet. Add custom skills or paste resume below.</span>
                   ) : (
                     localSkills.map((skill) => (
-                      <Badge 
-                        key={skill} 
+                      <Badge
+                        key={skill}
                         variant="glow"
                         className="pr-1.5 flex items-center space-x-1.5"
                       >
                         <span>{skill}</span>
-                        <button 
+                        <button
                           type="button"
-                          onClick={() => handleRemoveSkill(skill)} 
+                          onClick={() => handleRemoveSkill(skill)}
                           className="hover:text-rose-400 shrink-0 cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -700,9 +699,9 @@ export default function SettingsPage() {
                   }}
                   className="flex-1 bg-[#0a071a]/50 text-slate-100 placeholder-slate-500 text-xs rounded-xl border border-white/10 px-4 py-2.5 focus:outline-none focus:border-indigo-500/80"
                 />
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={handleAddSkill}
                   className="h-10 px-3 rounded-xl flex items-center justify-center border-white/10 text-slate-300 hover:text-white"
                 >
@@ -785,7 +784,12 @@ export default function SettingsPage() {
 
           <Card hoverEffect={false}>
             <CardHeader>
-              <CardTitle>Professional Links</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <span>Professional Links</span>
+                <Tooltip content="These links are used to enrich your career score and may be displayed on your public portfolio page if you've enabled it.">
+                  <Info className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Professional links information" />
+                </Tooltip>
+              </CardTitle>
               <CardDescription>Manage your GitHub, LinkedIn, and Resume URLs.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -890,7 +894,12 @@ export default function SettingsPage() {
           {/* ─── CONNECTED ACCOUNTS ───────────────────────── */}
           <Card hoverEffect={false}>
             <CardHeader>
-              <CardTitle className="text-base font-bold">Connected Integrations</CardTitle>
+              <CardTitle className="text-base font-bold flex items-center gap-2">
+                <span>Connected Integrations</span>
+                <Tooltip content="Connected accounts are periodically synced to keep your GitHub analytics and endorsements up to date, and factor into your overall readiness score.">
+                  <Info className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Connected integrations information" />
+                </Tooltip>
+              </CardTitle>
               <CardDescription className="text-xs">Connect credentials to sync active files.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-1 overflow-x-auto">
@@ -970,11 +979,16 @@ export default function SettingsPage() {
           {/* ─── DATA MANAGEMENT ───────────────────────── */}
           <Card hoverEffect={false}>
             <CardHeader>
-              <CardTitle className="text-base font-bold text-indigo-300">Data Management</CardTitle>
+              <CardTitle className="text-base font-bold text-indigo-300 flex items-center gap-2">
+                <span>Data Management</span>
+                <Tooltip content="Exports include your profile, projects, and roadmap progress as a JSON file. Importing overwrites your current data with the contents of the uploaded file.">
+                  <Info className="h-3.5 w-3.5 cursor-help text-indigo-400/70 hover:text-indigo-300 transition-colors" aria-label="Data management information" />
+                </Tooltip>
+              </CardTitle>
               <CardDescription className="text-xs">Export or import your profile and projects data.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-1 overflow-x-auto">
-              
+
               <div className="p-3.5 bg-indigo-500/5 rounded-xl border border-indigo-500/10 flex flex-col space-y-3.5 text-xs text-slate-400">
                 <div>
                   <h4 className="font-bold flex items-center text-slate-200">
@@ -1034,7 +1048,12 @@ export default function SettingsPage() {
           {/* ─── DANGER ZONES: RESET & DELETE ACCOUNTS ───────────────────── */}
           <Card hoverEffect={false} className="border-rose-500/20">
             <CardHeader>
-              <CardTitle className="text-base font-bold text-rose-300">Danger Operations</CardTitle>
+              <CardTitle className="text-base font-bold text-rose-300 flex items-center gap-2">
+                <span>Danger Operations</span>
+                <Tooltip content="These actions are irreversible. Resetting or deleting will permanently erase the associated data with no way to recover it.">
+                  <Info className="h-3.5 w-3.5 cursor-help text-rose-400/70 hover:text-rose-300 transition-colors" aria-label="Danger operations information" />
+                </Tooltip>
+              </CardTitle>
               <CardDescription className="text-xs">Destructive changes that erase technical indices.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-1">

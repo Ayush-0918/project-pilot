@@ -33,9 +33,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { useAppStore } from '@/store/useAppStore';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Progress } from '@/components/ui/Progress';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Progress } from '@/components/ui/Progress';
 import type { RoadmapStep } from '@/types';
 
 function SortableStepCard({

@@ -1,14 +1,17 @@
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, X, Loader2 } from 'lucide-react';
+import { useUploadThing } from '@/lib/uploadthing';
+import type { OurFileRouter } from '@/app/api/uploadthing/core';
 import { cn } from '@/lib/utils';
 
 export interface UploadZoneProps {
-  onFileSelect: (fileName: string, base64Data: string) => void;
+  onFileSelect: (fileName: string, url: string) => void;
   onClear?: () => void;
   acceptedTypes?: string[];
   maxSizeMB?: number;
   initialFileName?: string | null;
+  endpoint?: 'avatarUploader' | 'resumeUploader';
 }
 
 export const UploadZone: React.FC<UploadZoneProps> = ({
@@ -16,39 +19,47 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
   onClear,
   acceptedTypes = ['.pdf', '.docx', '.txt'],
   maxSizeMB = 5,
-  initialFileName = null
+  initialFileName = null,
+  endpoint = 'resumeUploader',
 }) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const [fileName, setFileName] = useState<string | null>(initialFileName);
   const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const processFile = (file: File) => {
+  const { startUpload } = useUploadThing(endpoint as keyof OurFileRouter, {
+    onClientUploadComplete: (res: { url: string; name?: string }[]) => {
+      if (res?.[0]?.url) {
+        onFileSelect(res[0].name || 'resume', res[0].url);
+        setFileName(res[0].name || 'resume');
+      }
+      setIsUploading(false);
+    },
+    onUploadError: (err: Error) => {
+      setError(err.message || 'Upload failed');
+      setFileName(null);
+      setIsUploading(false);
+    },
+  });
+
+  const processFile = async (file: File) => {
     setError(null);
 
-    // Validate size
     if (file.size > maxSizeMB * 1024 * 1024) {
       setError(`File is too large. Maximum size is ${maxSizeMB}MB.`);
       return;
     }
 
-    // Validate extension
     const extension = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!acceptedTypes.includes(extension)) {
       setError(`Invalid file type. Supported formats: ${acceptedTypes.join(', ')}`);
       return;
     }
 
-    // Convert file to Base64 to save in Zustand/LocalState
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFileName(file.name);
-      onFileSelect(file.name, reader.result as string);
-    };
-    reader.onerror = () => {
-      setError('Error reading file. Please try again.');
-    };
-    reader.readAsDataURL(file);
+    setIsUploading(true);
+    setFileName(file.name);
+    await startUpload([file]);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -95,7 +106,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
       />
 
       <AnimatePresence mode="wait">
-        {fileName ? (
+        {fileName && !isUploading ? (
           <motion.div
             key="uploaded"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -145,6 +156,17 @@ onMouseLeave={(e) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
+          </motion.div>
+        ) : isUploading ? (
+          <motion.div
+            key="uploading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="w-full glass-panel p-5 rounded-2xl flex items-center justify-center space-x-3"
+          >
+            <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+            <span className="text-sm text-slate-300">Uploading resume...</span>
           </motion.div>
         ) : (
           <motion.div

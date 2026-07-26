@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { X, Share2, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
 import { generateProjectTweet, ProjectTweetInput } from '@/app/actions/generateTweet';
+import { Button } from '@/components/ui/Button';
+import { motion } from 'framer-motion';
+import { Loader2, Share2, X } from 'lucide-react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
-
 interface ShareToXModalProps {
   project: ProjectTweetInput;
   onClose: () => void;
