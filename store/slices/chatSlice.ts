@@ -6,6 +6,7 @@ import {
   ChatMessage,
   User,
 } from "@/types";
+import { saveConversation } from "@/app/actions/chatActions";
 
 export interface ChatSlice {
   conversations: ChatConversation[];
@@ -97,7 +98,7 @@ export const createChatSlice =
       if (!activeId) return {};
 
       const newMessage: ChatMessage = {
-        id: "msg-usr-" + Math.random().toString(36).substr(2,9),
+        id: "msg-usr-" + crypto.randomUUID(),
         role: "user",
         content,
         timestamp: new Date(),
@@ -118,7 +119,7 @@ export const createChatSlice =
         });
 
       const aiMessageId =
-        "msg-ai-"+Math.random().toString(36).substr(2,9);
+        "msg-ai-"+crypto.randomUUID();
 
       const initialAiMessage:ChatMessage={
         id:aiMessageId,
@@ -223,11 +224,16 @@ export const createChatSlice =
               })
 
             }));
-
+ 
           }
-
+ 
+          saveConversation(
+            activeConv.title,
+            [...activeConv.messages, newMessage, { id: aiMessageId, role: 'assistant', content: aiContent } as ChatMessage].map(m => ({ role: m.role, content: m.content }))
+          );
+ 
         }
-
+ 
         catch(error){
 
           console.error(error);
@@ -288,7 +294,7 @@ export const createChatSlice =
 
   createNewConversation:(title)=>{
 
-    const id="conv-"+Math.random().toString(36).substr(2,9);
+    const id="conv-"+crypto.randomUUID();
 
     const conv:ChatConversation={
 
@@ -300,7 +306,7 @@ export const createChatSlice =
 
         {
 
-          id:"msg-"+Math.random().toString(36).substr(2,9),
+          id:"msg-"+crypto.randomUUID(),
 
           role:"assistant",
 
