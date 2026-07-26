@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { toast } from 'sonner';
 import { 
   User, 
   OnboardingData, 
@@ -13,19 +14,27 @@ import {
 
 import { generateAdaptiveDashboard } from '@/lib/adaptiveEngine';
 import { toggleProjectMilestoneInDb, createActivityInDb, saveProjectToDb } from '@/app/actions/projectActions';
+import { createOnboardingSlice, OnboardingSlice } from "./slices/onboardingSlice";
+import { createAuthSlice, AuthSlice } from "./slices/authSlice";
+import { createProjectSlice, ProjectSlice } from "./slices/projectSlice";
+import { createChatSlice, ChatSlice } from "./slices/chatSlice";
+import { createGithubSlice, GithubSlice } from "./slices/githubSlice";
+import { createCareerSlice, CareerSlice } from "./slices/careerSlice";
 
 // Neutral placeholder used before the authenticated user profile is hydrated from the DB.
 // This is intentionally empty — real data flows in via syncUserProfile() on mount.
 const DEFAULT_USER: User = {
   id: 'user-yogender',
   name: 'Yogender Verma',
+  username: 'yogender-verma',
   email: 'yogendarverma0268@gmail.com',
   avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80',
   careerGoal: 'AI Engineer',
+  skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS'],
+  portfolioPublic: false,
   githubUrl: '',
   linkedinUrl: '',
   resumeUrl: '',
-  skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS']
 };
 
 const initialAdaptive = generateAdaptiveDashboard(DEFAULT_USER);
@@ -258,7 +267,13 @@ const MOCK_GITHUB: GitHubAnalytics = {
 // Initial Career Score Mock Data
 const MOCK_CAREER: CareerScore = initialAdaptive.careerScore;
 
-interface AppStore {
+export interface AppStore
+  extends OnboardingSlice,
+    AuthSlice,
+    ProjectSlice,
+    ChatSlice,
+    GithubSlice,
+    CareerSlice {
   // Onboarding State
   onboardingData: OnboardingData;
   onboardingStep: number;
@@ -266,55 +281,17 @@ interface AppStore {
   setOnboardingStep: (step: number) => void;
   resetOnboarding: () => void;
 
-  // Auth State
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (email: string, name: string) => void;
-  signup: (email: string, name: string, careerGoal: string) => void;
-  logout: () => void;
-  updateProfile: (name: string, email: string, careerGoal: string) => void;
-  updateAvatar: (avatarUrl: string) => void;
-  updateProfessionalLinks: (
-    githubUrl: string,
-    linkedinUrl: string,
-    resumeUrl: string
-  ) => void;
-  updateUserSkills: (skills: string[]) => void;
-  syncUserProfile: (dbUser: any) => void;
-
-  // Projects State
-  projects: Project[];
-  selectedProjectId: string | null;
-  setProjects: (projects: Project[]) => void;
-  selectProject: (id: string | null) => void;
-
-  // Project Activity State
-  activities: ProjectActivity[];
-  setActivities: (activities: ProjectActivity[]) => void;
-
-  // Roadmaps State
-  roadmaps: Record<string, Roadmap>;
-  toggleStepCompletion: (projectId: string, stepId: string) => void;
-  toggleTaskCompletion: (projectId: string, stepId: string, taskIndex: number) => void;
-  initializeRoadmap: (projectId: string, title: string) => void;
-
-  // Chat State
-  conversations: ChatConversation[];
-  activeConversationId: string | null;
-  sendMessage: (content: string, codeSnippet?: { language: string; code: string }, attachments?: { name: string; size: string; type: string }[]) => void;
-  createNewConversation: (title?: string) => string;
-  selectConversation: (id: string) => void;
-  deleteConversation: (id: string) => void;
-
   // GitHub Analytics State
-  githubAnalytics: GitHubAnalytics;
-  connectGithub: (username: string) => void;
-  disconnectGithub: () => void;
+githubAnalytics: GitHubAnalytics;
+connectGithub: (username: string) => Promise<void>;
+disconnectGithub: () => void;
+
 
   // Career Score State
   careerScore: CareerScore;
   recalculateCareerScore: () => void;
 }
+
 
 export const useAppStore = create<AppStore>((set, get) => ({
   // Onboarding state
@@ -975,4 +952,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
     };
   })
+
+export const useAppStore = create<AppStore>()((set, get, api) => ({
+  ...createOnboardingSlice(set, get, api),
+  ...createAuthSlice(set, get, api),
+  ...createProjectSlice(
+  MOCK_PROJECTS,
+  INITIAL_ROADMAPS
+)(set, get, api),
+  ...createChatSlice(
+  INITIAL_CONVERSATIONS,
+  DEFAULT_USER
+)(set, get, api),
+  ...createGithubSlice(MOCK_GITHUB)(set, get, api),
+  ...createCareerSlice(MOCK_CAREER)(set, get, api),
+
 }));

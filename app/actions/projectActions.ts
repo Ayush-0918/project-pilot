@@ -35,9 +35,9 @@ async function getAuthenticatedUserId(): Promise<string> {
 }
 
 /**
- * Fetches all projects associated with the current user.
+ * Fetches all projects associated with the current user with pagination support.
  */
-export async function getUserProjects() {
+export async function getUserProjects(take?: number, skip?: number) {
   try {
     const clerkId = await getAuthenticatedUserId();
     
@@ -46,6 +46,8 @@ export async function getUserProjects() {
       where: { clerkId },
       include: {
         projects: {
+          ...(take !== undefined ? { take } : {}),
+          ...(skip !== undefined ? { skip } : {}),
           include: {
             activities: {
               orderBy: { createdAt: 'desc' }
@@ -219,7 +221,7 @@ export async function toggleProjectMilestoneInDb(projectId: string, stepId: stri
     if (completedStep) {
       await createUserNotification(clerkId, {
         title: 'Milestone completed',
-        message: `${completedStep.title} was completed in ${updatedProject.title}.`,
+        message: `${completedStep.title} was completed in ${updatedProject.title}. (+2 Career Score)`,
         type: 'milestone_completed',
         dedupeKey: `milestone-completed:${projectId}:${stepId}`,
         link: `/dashboard/projects/${projectId}`,
@@ -245,6 +247,38 @@ export async function toggleProjectMilestoneInDb(projectId: string, stepId: stri
     if (process.env.NODE_ENV === 'development') {
       console.warn('Postgres offline. Bypassing toggleProjectMilestoneInDb in offline-mode.');
       return null;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Reorders the steps/milestones in a project's roadmap and persists the new order.
+ */
+export async function reorderProjectMilestonesInDb(projectId: string, steps: any[]) {
+  try {
+    const clerkId = await getAuthenticatedUserId();
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId }
+    });
+
+    if (!dbUser) {
+      throw new Error('User record not found.');
+    }
+
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { roadmap: steps }
+    });
+
+    return { success: true as const };
+  } catch (error) {
+    console.error('Failed to reorder project milestones in database:', error);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Postgres offline. Bypassing reorderProjectMilestonesInDb in offline-mode.');
+      return { success: false as const };
     }
     throw error;
   }

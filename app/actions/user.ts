@@ -12,6 +12,19 @@ export interface OnboardingPayload {
   dailyStudyTime: number;
 }
 
+export interface UserContext {
+  name: string;
+  careerGoal: string;
+  skills: string[];
+}
+
+const normalizeSkills = (skills: unknown): string[] =>
+  Array.isArray(skills)
+    ? skills.filter((skill): skill is string => typeof skill === 'string').map((skill) => skill.trim()).filter(Boolean)
+    : typeof skills === 'string'
+      ? skills.split(',').map((skill) => skill.trim()).filter(Boolean)
+      : [];
+
 /**
  * Persists onboarding data to PostgreSQL.
  * Supports both real Clerk sessions and developer sandboxes.
@@ -97,7 +110,7 @@ export async function getCurrentUserProfile() {
   }
 
   try {
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { clerkId: userId },
       include: {
         projects: {
@@ -109,11 +122,57 @@ export async function getCurrentUserProfile() {
         }
       }
     });
+    return user
+      ? {
+          ...user,
+          name: user.fullName || 'User',
+          careerGoal: user.dreamRole || 'Software Developer',
+          skills: normalizeSkills(user.skills),
+        }
+      : null;
   } catch (error) {
     console.error('Failed to fetch user profile:', error);
     // Return null so callers can fall back to Clerk identity data.
     // Do NOT return a fake 'Dev User' object — that causes dummy data to appear on the dashboard.
     return null;
+  }
+}
+
+/**
+ * Returns the safe, normalized profile context used by the AI Mentor.
+ */
+export async function getUserContext(): Promise<UserContext> {
+  let userId: string | null = null;
+
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    const session = await auth();
+    userId = session.userId;
+  } else if (process.env.NODE_ENV === 'development') {
+    userId = 'mock-developer-id';
+  }
+
+  if (!userId) {
+    return { name: 'User', careerGoal: 'Software Developer', skills: [] };
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      select: {
+        fullName: true,
+        dreamRole: true,
+        skills: true,
+      },
+    });
+
+    return {
+      name: user?.fullName || 'User',
+      careerGoal: user?.dreamRole || 'Software Developer',
+      skills: normalizeSkills(user?.skills),
+    };
+  } catch (error) {
+    console.error('Failed to fetch AI Mentor user context:', error);
+    return { name: 'User', careerGoal: 'Software Developer', skills: [] };
   }
 }
 
@@ -155,6 +214,131 @@ export async function updateProfileAvatar(imageUrl: string) {
   }
 }
 
+/**
+ * Persists the user's updated skills array to the PostgreSQL database.
+ */
+export async function updateUserSkillsInDb(skills: string[]) {
+  let userId: string | null = null;
+
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    const session = await auth();
+    userId = session.userId;
+  } else if (process.env.NODE_ENV === "development") {
+    userId = "mock-developer-id";
+  }
+
+  if (!userId) {
+    throw new Error("Unauthenticated user attempt to update skills.");
+  }
+
+  try {
+    return await prisma.user.update({
+      where: {
+        clerkId: userId,
+      },
+      data: {
+        skills,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to update user skills in database:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      return {
+        clerkId: userId,
+        skills,
+      };
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Updates public portfolio visibility & custom username settings.
+ */
+export async function updatePortfolioSettings(portfolioPublic: boolean, customUsername?: string) {
+  let userId: string | null = null;
+
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    const session = await auth();
+    userId = session.userId;
+  } else if (process.env.NODE_ENV === "development") {
+    userId = "mock-developer-id";
+  }
+
+  if (!userId) {
+    throw new Error("Unauthenticated user attempt.");
+  }
+
+  const username = customUsername
+    ? customUsername.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-")
+    : undefined;
+
+  try {
+    return await prisma.user.update({
+      where: { clerkId: userId },
+      data: {
+        portfolioPublic,
+        ...(username ? { username } : {}),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to update portfolio settings:", error);
+    if (process.env.NODE_ENV === "development") {
+      return {
+        clerkId: userId,
+        portfolioPublic,
+        ...(username ? { username } : {}),
+      };
+    }
+    throw error;
+  }
+}
+
+/**
+ * Fetches public portfolio data by username/handle or ID.
+ * Returns null if user is not found or if portfolioPublic is false.
+ */
+export async function getPublicPortfolioData(usernameParam: string) {
+  const cleanUsername = usernameParam.trim().toLowerCase();
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: cleanUsername },
+          { clerkId: usernameParam },
+          { id: usernameParam },
+          { email: { startsWith: cleanUsername } },
+        ],
+      },
+      include: {
+        projects: {
+          include: {
+            activities: {
+              orderBy: { createdAt: "desc" },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user || !user.portfolioPublic) {
+      return null;
+    }
+
+    const { email, clerkId, ...publicProfile } = user;
+    return publicProfile;
+  } catch (error) {
+    console.error("Failed to fetch public portfolio data:", error);
+    return null;
+  }
+}
+
+/**
+ * Updates the current user's professional links (GitHub, LinkedIn, Resume URL).
+ */
 export async function updateProfessionalLinks(data: {
   githubUrl?: string;
   linkedinUrl?: string;
@@ -170,65 +354,61 @@ export async function updateProfessionalLinks(data: {
   }
 
   if (!userId) {
-    throw new Error("Unauthenticated user.");
+    throw new Error("Unauthenticated user attempt.");
   }
 
   try {
-    return await prisma.user.upsert({
-  where: {
-    clerkId: userId,
-  },
-  update: {
-    githubUrl: data.githubUrl || null,
-    linkedinUrl: data.linkedinUrl || null,
-    resumeUrl: data.resumeUrl || null,
-  },
-  create: {
-    clerkId: userId,
-    fullName: "Dev User",
-    email: `dev-${userId}@localhost`,
-    skills: [],
-    githubUrl: data.githubUrl || null,
-    linkedinUrl: data.linkedinUrl || null,
-    resumeUrl: data.resumeUrl || null,
-    onboardingCompleted: false,
-  },
-});
+    return await prisma.user.update({
+      where: { clerkId: userId },
+      data: {
+        githubUrl: data.githubUrl ?? null,
+        linkedinUrl: data.linkedinUrl ?? null,
+        resumeUrl: data.resumeUrl ?? null,
+      },
+    });
   } catch (error) {
-
+    console.error("Failed to update professional links:", error);
     if (process.env.NODE_ENV === "development") {
       return {
         clerkId: userId,
-        ...data,
+        githubUrl: data.githubUrl,
+        linkedinUrl: data.linkedinUrl,
+        resumeUrl: data.resumeUrl,
       };
     }
-
     throw error;
   }
 }
 
+/**
+ * Retrieves the current user's professional links from the database.
+ */
 export async function getProfessionalLinks() {
-  let userId: string |null = null;
+  let userId: string | null = null;
 
   if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-      const session = await auth();
-      userId = session.userId;
+    const session = await auth();
+    userId = session.userId;
   } else if (process.env.NODE_ENV === "development") {
-      userId = "mock-developer-id";
+    userId = "mock-developer-id";
   }
 
-  if (!userId) return null;
+  if (!userId) {
+    return null;
+  }
 
-  const user = await prisma.user.findUnique({
-      where:{
-          clerkId:userId,
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      select: {
+        githubUrl: true,
+        linkedinUrl: true,
+        resumeUrl: true,
       },
-      select:{
-          githubUrl:true,
-          linkedinUrl:true,
-          resumeUrl:true,
-      }
-  });
-
-  return user;
+    });
+    return user;
+  } catch (error) {
+    console.error("Failed to fetch professional links:", error);
+    return null;
+  }
 }
