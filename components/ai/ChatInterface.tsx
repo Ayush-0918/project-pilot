@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/Button';
 import { Send, Sparkles, AlertTriangle, RefreshCw } from 'lucide-react';
 
 export default function ChatInterface() {
-  const { messages, status, sendMessage, reload, error } = useChat();
+  const chatData = useChat() as any;
+  const { messages, status, error } = chatData;
+  const sendMessage = chatData.sendMessage || chatData.append;
+  const reload = chatData.reload;
   const [input, setInput] = useState('');
   const [isTimedOut, setIsTimedOut] = useState(false);
   

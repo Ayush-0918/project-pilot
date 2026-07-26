@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -31,30 +30,50 @@ model User {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  title       String
-  description String?  @db.Text
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String         @id @default(cuid())
+  title         String
+  description   String?        @db.Text
+  status        String         @default("In Progress")
+  progress      Int            @default(0)
+  tags          String[]
+  roadmap       Json?
+  dueAt         DateTime?
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities    Activity[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Notification {
   id        String   @id @default(cuid())
+  title     String   @default("Notification")
+  message   String
+  type      String?
+  link      String?
+  dedupeKey String?  @unique
+  isRead    Boolean  @default(false)
+  read      Boolean  @default(false)
+  dueAt     DateTime?
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  message   String
-  read      Boolean  @default(false)
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Activity {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action    String
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  action      String?
+  type        String?
+  description String?
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 }
 
 model AiMessage {

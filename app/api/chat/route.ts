@@ -40,6 +40,16 @@ export async function GET(req: Request) {
 // POST: Handle chat streaming, context injection, and database persistence
 export async function POST(req: Request) {
   try {
+
+    const {
+      messages,
+      userContext,
+      isRoastMode,
+      isMockInterview,
+      endInterview,
+      translateLanguage,
+    } = await req.json();
+
     const { userId: clerkId } = await auth();
     let dbUserId: string | undefined = undefined;
 
@@ -52,8 +62,6 @@ export async function POST(req: Request) {
         dbUserId = user.id;
       }
     }
-
-    const { messages, userContext, isRoastMode, isMockInterview, endInterview } = await req.json();
     const latestUserMessage = messages[messages.length - 1];
 
     // Resilient simulated streaming fallback mode when API key is unconfigured
@@ -181,6 +189,12 @@ Topics to Improve:
 Hiring Recommendation:`
     : ""
 }`;
+    }
+
+    // If the user picked a translate language, append instructions so every
+    // future response is written in that language, except code stays in English.
+    if (translateLanguage) {
+      systemPrompt += `\n\nIMPORTANT LANGUAGE INSTRUCTION: You are an expert AI mentor. Please provide all responses in conversational ${translateLanguage}, while keeping code blocks, variable names, and syntax in standard English.`;
     }
 
     // Gemini strictly requires the first message to be from the user.
