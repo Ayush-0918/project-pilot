@@ -1,26 +1,27 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { useClerk, useUser } from '@clerk/nextjs';
-import {
-  Compass,
-  LayoutDashboard,
-  FolderGit2,
-  Map,
-  MessageSquareCode,
-  GitMerge,
-  Award,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  User as UserIcon
-} from 'lucide-react';
+import Tooltip from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useAppStore';
+import { useClerk, useUser } from '@clerk/nextjs';
+import {
+  Award,
+  ChevronLeft,
+  ChevronRight,
+  Compass,
+  FolderGit2,
+  GitMerge,
+  LayoutDashboard,
+  LogOut,
+  Map,
+  MessageSquareCode,
+  Settings,
+  User as UserIcon
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import React from 'react';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -42,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
 
   const handleSignOut = async () => {
     logout();
-    try { await signOut(); } catch(e) {}
+    try { await signOut(); } catch (e) { }
     router.push('/');
   };
 
@@ -112,9 +113,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
           const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
           const Icon = item.icon;
 
-          return (
+          const link = (
             <Link
-              key={item.name}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
@@ -138,21 +138,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
                   {item.name}
                 </span>
               )}
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <div
-                  role="tooltip"
-                  className="absolute left-20 text-white text-xs px-2.5 py-1.5 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 shadow-xl whitespace-nowrap z-50 border"
-                  style={{
-                    backgroundColor: 'var(--panel-bg)',
-                    borderColor: 'var(--panel-border)',
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  {item.name}
-                </div>
-              )}
             </Link>
+          );
+
+          // Only wrap with the Radix tooltip while collapsed — when expanded,
+          // the label is already visible next to the icon so no tooltip is needed.
+          return collapsed ? (
+            <Tooltip key={item.name} content={item.name} side="right">
+              {link}
+            </Tooltip>
+          ) : (
+            <React.Fragment key={item.name}>{link}</React.Fragment>
           );
         })}
       </nav>

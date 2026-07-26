@@ -1,14 +1,24 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Activity, ShieldCheck, Sparkles, ArrowUpRight, 
-  Star, GitFork, Code, Target, Zap, BrainCircuit
-} from 'lucide-react';
-import { Github } from '@/components/ui/BrandIcons';
-import dynamic from 'next/dynamic';
 import { PieChartSkeleton } from '@/components/charts/ChartSkeleton';
+import { Badge } from '@/components/ui/Badge';
+import { Github } from '@/components/ui/BrandIcons';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Progress } from '@/components/ui/Progress';
+import Tooltip from '@/components/ui/Tooltip';
+import { useAppStore } from '@/store/useAppStore';
+import {
+  Activity,
+  ArrowUpRight,
+  BrainCircuit,
+  Code,
+  GitFork,
+  Info,
+  ShieldCheck, Sparkles,
+  Star,
+  Target, Zap
+} from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 const LanguagePieChart = dynamic(
   () => import('@/components/charts/LanguagePieChart'),
@@ -17,16 +27,11 @@ const LanguagePieChart = dynamic(
     loading: () => <PieChartSkeleton />,
   }
 );
-import { useAppStore } from '@/store/useAppStore';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Progress } from '@/components/ui/Progress';
-import { Button } from '@/components/ui/Button';
 
 export default function GitHubAnalyticsPage() {
   const { githubAnalytics } = useAppStore();
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -68,12 +73,22 @@ export default function GitHubAnalyticsPage() {
               <p className="text-[10px] text-emerald-400 font-semibold">High consistency</p>
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Portfolio Strength</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                Portfolio Strength
+                <Tooltip content="Derived from repository count, code quality signals, commit consistency, and documentation completeness across your public repos.">
+                  <Info className="h-3 w-3 cursor-help hover:text-indigo-400 transition-colors" aria-label="Portfolio strength information" />
+                </Tooltip>
+              </span>
               <h3 className="text-3xl font-extrabold" style={{ color: 'var(--text-primary)' }}>{githubAnalytics.portfolioStrengthScore}%</h3>
               <Progress value={githubAnalytics.portfolioStrengthScore} className="h-1.5 mt-2" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>AI Readiness</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                AI Readiness
+                <Tooltip content="Measures exposure to AI/ML tooling, frameworks, and orchestration patterns detected across your repositories.">
+                  <Info className="h-3 w-3 cursor-help hover:text-indigo-400 transition-colors" aria-label="AI readiness information" />
+                </Tooltip>
+              </span>
               <h3 className="text-3xl font-extrabold" style={{ color: 'var(--text-primary)' }}>{githubAnalytics.aiEngineerReadiness}%</h3>
               <Progress value={githubAnalytics.aiEngineerReadiness} className="h-1.5 mt-2 bg-slate-800 [&>div]:bg-indigo-500" />
             </div>
@@ -106,15 +121,20 @@ export default function GitHubAnalyticsPage() {
               <ShieldCheck className="w-4.5 h-4.5" />
               <span className="text-[10px] font-bold uppercase tracking-wider font-mono">AI Recruiter Intelligence</span>
             </div>
-            <CardTitle className="text-base font-bold">Automated Profile Analysis</CardTitle>
+            <CardTitle className="text-base font-bold flex items-center gap-1.5">
+              <span>Automated Profile Analysis</span>
+              <Tooltip content="AI-generated observations based on your repository activity, code structure, and commit patterns — written from a recruiter's perspective.">
+                <Info className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Automated profile analysis information" />
+              </Tooltip>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
-              {githubAnalytics.recruiterInsights.map((insight, idx) => (
+            {githubAnalytics.recruiterInsights.map((insight, idx) => (
               <div key={idx} className="p-3 rounded-lg border flex items-start space-x-3 text-sm leading-relaxed" style={{ backgroundColor: 'var(--hover-bg)', borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}>
-                  <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                  <span>{insight}</span>
-                </div>
-              ))}
+                <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                <span>{insight}</span>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
@@ -125,6 +145,9 @@ export default function GitHubAnalyticsPage() {
               <div className="flex items-center space-x-2 text-emerald-400 mb-1">
                 <BrainCircuit className="w-4.5 h-4.5" />
                 <span className="text-[10px] font-bold uppercase tracking-wider font-mono">Inferred Capabilities</span>
+                <Tooltip content="Skills detected automatically from your repositories' languages, dependencies, and file structures — not self-reported.">
+                  <Info className="h-3 w-3 cursor-help text-emerald-400/70 hover:text-emerald-300 transition-colors" aria-label="Inferred capabilities information" />
+                </Tooltip>
               </div>
               <CardTitle className="text-base font-bold">Detected Skills</CardTitle>
             </CardHeader>
@@ -140,6 +163,9 @@ export default function GitHubAnalyticsPage() {
               <div className="flex items-center space-x-2 text-amber-400 mb-1">
                 <Target className="w-4.5 h-4.5" />
                 <span className="text-[10px] font-bold uppercase tracking-wider font-mono">Actionable Steps</span>
+                <Tooltip content="Personalized suggestions generated by comparing your current skill profile against your target role's requirements.">
+                  <Info className="h-3 w-3 cursor-help text-amber-400/70 hover:text-amber-300 transition-colors" aria-label="Actionable steps information" />
+                </Tooltip>
               </div>
               <CardTitle className="text-base font-bold">Growth Recommendations</CardTitle>
             </CardHeader>
@@ -160,6 +186,9 @@ export default function GitHubAnalyticsPage() {
         <h3 className="text-lg font-bold flex items-center space-x-2 mb-4" style={{ color: 'var(--text-primary)' }}>
           <Code className="w-5 h-5 text-indigo-400" />
           <span>Repository Intelligence</span>
+          <Tooltip content="Per-repository breakdown of stack detection, code analysis, and a suggested next step to strengthen that project.">
+            <Info className="h-3.5 w-3.5 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Repository intelligence information" />
+          </Tooltip>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {githubAnalytics.repositoryIntelligence.map((repo, idx) => (

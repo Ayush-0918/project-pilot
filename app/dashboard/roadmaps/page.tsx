@@ -1,23 +1,18 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { 
-  Map, 
-  CheckCircle, 
-  Clock, 
-  Cpu, 
-  Sparkles, 
-  ChevronRight, 
-  Terminal as TermIcon
-} from 'lucide-react';
-import { useAppStore } from '@/store/useAppStore';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Progress } from '@/components/ui/Progress';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Progress } from '@/components/ui/Progress';
+import { useAppStore } from '@/store/useAppStore';
+import {
+  CheckCircle,
+  Clock,
+  Map,
+  Sparkles
+} from 'lucide-react';
+import Link from 'next/link';
 
 export default function VisualRoadmapsPage() {
   const { projects, selectedProjectId, roadmaps, toggleStepCompletion } = useAppStore();

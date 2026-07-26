@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
-import { CheckCircle, ChevronDown, Download, FileText, XCircle } from 'lucide-react';
 import { getOwnedProjectForExport } from '@/app/actions/projectActions';
 import { Button } from '@/components/ui/Button';
-import type { Project, Roadmap } from '@/types';
+import Tooltip from '@/components/ui/Tooltip';
 import {
   buildExportableProject,
   downloadTextFile,
@@ -12,6 +10,9 @@ import {
   serializeProjectJson,
   serializeProjectMarkdown,
 } from '@/lib/projectExport';
+import type { Project, Roadmap } from '@/types';
+import { CheckCircle, ChevronDown, Download, FileText, Info, XCircle } from 'lucide-react';
+import React from 'react';
 
 type ExportFormat = 'markdown' | 'json';
 
@@ -120,6 +121,17 @@ export function ProjectExportMenu({ project, roadmap }: ProjectExportMenuProps) 
           role="menu"
           className="absolute right-0 z-30 mt-2 w-full min-w-56 overflow-hidden rounded-xl border border-white/10 bg-[#0b0820] p-1.5 shadow-2xl md:w-64"
         >
+           <div className="flex items-center gap-1.5 px-2 pb-1.5 pt-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              Choose a format
+            </span>
+            <Tooltip content="Exports include your project details, milestones, and roadmap progress in the selected format.">
+              <Info
+                className="h-3 w-3 cursor-help text-slate-500 hover:text-indigo-400 transition-colors"
+                aria-label="Export format information"
+              />
+            </Tooltip>
+          </div>
           <button
             type="button"
             role="menuitem"
