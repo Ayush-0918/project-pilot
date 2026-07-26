@@ -37,7 +37,8 @@ model Project {
   userId      String
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   activities  Activity[]
-  dueAt      DateTime?
+  milestones  Milestone[]
+  dueAt       DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -71,3 +72,17 @@ model Activity {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 }
+
+model Milestone {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String   @default("UPCOMING") // UPCOMING, ONGOING, COMPLETED
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+

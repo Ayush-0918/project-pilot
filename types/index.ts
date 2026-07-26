@@ -25,6 +25,14 @@ export interface OnboardingData {
   availableHoursPerWeek: number;
 }
 
+export interface Milestone {
+  id: string;
+  title: string;
+  description?: string | null;
+  dueDate?: Date | string | null;
+  status: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -49,6 +57,7 @@ export interface Project {
   updatedAt?: Date | string;
   githubUrl?: string;
   liveUrl?: string;
+  milestones?: Milestone[];
 }
 
 export type ProjectActivityType =
