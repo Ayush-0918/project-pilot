@@ -17,10 +17,11 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-webServer: {
+  ],
+  webServer: {
     command: 'npm run build && npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000, // Give it enough time to build in GitHub Actions
+    timeout: 120 * 1000,
   },
 });
