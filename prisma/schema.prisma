@@ -24,9 +24,24 @@ model User {
   projects            Project[]
   notifications       Notification[]
   activities          Activity[]
-  aiMessages          AiMessage[]    @relation("UserAiMessages")
+  subscription        Subscription?
+  aiMessages          AiMessage[]
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
+}
+
+model Subscription {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  planTier       String   @default("free")
+  status         String   @default("inactive")
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Project {
@@ -81,7 +96,7 @@ model AiMessage {
   userId    String   
   role      String   // "user" or "assistant"
   content   String   @db.Text
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserAiMessages")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])

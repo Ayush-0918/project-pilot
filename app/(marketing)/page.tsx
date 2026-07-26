@@ -519,9 +519,20 @@ export default function MarketingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter className="pt-2">
-                  <Link href="/onboarding" className="w-full">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/stripe/checkout', { method: 'POST' });
+                        const data = await res.json();
+                        if (data.url) window.location.href = data.url;
+                      } catch {
+                        window.location.href = '/onboarding';
+                      }
+                    }}
+                    className="w-full"
+                  >
                     <Button variant="premium" className="w-full">Get Premium Access</Button>
-                  </Link>
+                  </button>
                 </CardFooter>
               </Card>
 
