@@ -95,18 +95,7 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPro
     <div className="min-h-screen bg-[#070514] text-slate-100 selection:bg-indigo-500 selection:text-white print:bg-white print:text-slate-900">
       <CustomCursor />
 
-      {/* Print-specific Optimizations */}
-      <style jsx global>{`
-        @media print {
-          @page { size: A4; margin: 15mm; }
-          header, .no-print, button { display: none !important; }
-          body, .min-h-screen { background-color: #ffffff !important; color: #1e293b !important; }
-          section { break-inside: avoid; background: #ffffff !important; border: 1px solid #e2e8f0 !important; box-shadow: none !important; color: #1e293b !important; margin-bottom: 1rem; padding: 1rem !important; }
-          h1, h2, h3, p, span { color: #0f172a !important; }
-          .text-slate-300, .text-slate-400, .text-slate-500 { color: #475569 !important; }
-          .bg-white\/5, .bg-indigo-950\/40 { background-color: #f8fafc !important; border-color: #e2e8f0 !important; }
-        }
-      `}</style>
+      
 
       {/* Top Glassmorphic Navigation Bar */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#070514]/80 border-b border-white/10 px-4 sm:px-8 py-3 flex items-center justify-between">
