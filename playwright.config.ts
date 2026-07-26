@@ -21,6 +21,6 @@ webServer: {
     command: 'npm run build && npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000, // Increase timeout to give the build step enough time in CI
+    timeout: 120 * 1000, // Give it enough time to build in GitHub Actions
   },
 });
