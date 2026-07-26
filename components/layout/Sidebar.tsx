@@ -43,15 +43,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
 
   const handleSignOut = async () => {
     logout();
-<<<<<<< HEAD
     try {
   await signOut();
 } catch {
   // ignore Clerk sign-out errors
 }
-=======
-    try { await signOut(); } catch (e) { }
->>>>>>> main
     router.push('/');
   };
 
