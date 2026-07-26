@@ -27,19 +27,6 @@ import { Badge } from '@/components/ui/Badge';
 export default function MarketingPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } }
-  };
-
   const workflowSteps = [
     {
       num: '01',
@@ -126,8 +113,18 @@ export default function MarketingPage() {
     >
       {/* Background ambient glow blobs */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[20%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px]" />
-        <div className="absolute top-[-5%] right-[20%] w-[35%] h-[35%] rounded-full bg-purple-600/10 blur-[100px]" />
+        <div
+  className="absolute top-[-10%] left-[20%] w-[40%] h-[40%] rounded-full blur-[120px]"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.10)",
+  }}
+/>
+        <div
+  className="absolute top-[-5%] right-[20%] w-[35%] h-[35%] rounded-full blur-[100px]"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.10)",
+  }}
+/>
       </div>
 
       <Navbar />
@@ -143,10 +140,24 @@ export default function MarketingPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center space-x-2 bg-indigo-500/10 border border-indigo-500/30 px-3.5 py-1.5 rounded-full mb-8"
+              className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full mb-8"
+              style={{
+              backgroundColor: "rgba(var(--color-primary-rgb),0.10)",
+              border: "1px solid rgba(var(--color-primary-rgb),0.30)",
+              }}
             >
-              <Sparkles className="w-4 h-4 text-indigo-400 animate-spin" style={{ animationDuration: '3s' }} />
-              <span className="text-xs font-semibold text-indigo-400 tracking-wide uppercase">
+              <Sparkles
+              className="w-4 h-4 animate-spin"
+              style={{
+              color:"var(--color-primary)"
+              }}
+              />
+              <span
+              className="text-xs font-semibold tracking-wide uppercase"
+              style={{
+              color:"var(--color-primary)"
+              }}
+              >
                 Now Live: Next.js 15 &amp; AI-Orchestrator v2
               </span>
             </motion.div>
@@ -203,7 +214,18 @@ export default function MarketingPage() {
               className="w-full max-w-5xl mx-auto glass-panel p-2.5 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] relative group"
               style={{ borderColor: 'var(--border-medium)' }}
             >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300" />
+              <div
+              className="absolute -inset-0.5 rounded-3xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"
+              style={{
+              background: `linear-gradient(
+90deg,
+rgba(var(--color-primary-rgb),0.15),
+var(--color-primary),
+rgba(var(--color-primary-rgb),0.15)
+)`,
+              
+              }}
+              />
 
               {/* Mock dashboard */}
               <div
@@ -222,7 +244,12 @@ export default function MarketingPage() {
                   }}
                 >
                   <div>
-                    <div className="flex items-center space-x-2 text-indigo-400 mb-4">
+                    <div
+                    className="flex items-center space-x-2 mb-4"
+                    style={{
+                    color:"var(--color-primary)"
+                    }}
+                    >
                       <GraduationCap className="w-5 h-5 animate-pulse" />
                       <span className="text-xs font-bold tracking-wider uppercase">Career Blueprint Scans</span>
                     </div>
@@ -269,7 +296,12 @@ export default function MarketingPage() {
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <Badge variant="glow">AI Match Recommendation</Badge>
-                      <span className="text-xs text-indigo-400 font-semibold">★ Resume Impact: +45%</span>
+                      <span
+                      className="text-xs font-semibold"
+                      style={{
+                      color:"var(--color-primary)"
+                      }}
+                      >★ Resume Impact: +45%</span>
                     </div>
                     <h3 className="text-xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>
                       OmniAI Agentic Dashboard
@@ -283,10 +315,11 @@ export default function MarketingPage() {
                       {['Next.js 15', 'TypeScript', 'LangChain', 'FastAPI', 'Pinecone', 'Docker'].map((tech) => (
                         <span
                           key={tech}
-                          className="px-2 py-0.5 border text-[10px] font-semibold text-indigo-400 rounded-md"
+                          className="px-2 py-0.5 border text-[10px] font-semibold rounded-md"
                           style={{
-                            backgroundColor: 'rgba(99,102,241,0.1)',
-                            borderColor: 'rgba(99,102,241,0.25)',
+                          color:"var(--color-primary)",
+                          backgroundColor:"rgba(var(--color-primary-rgb),0.10)",
+                          borderColor:"rgba(var(--color-primary-rgb),0.25)",
                           }}
                         >
                           {tech}
@@ -303,12 +336,22 @@ export default function MarketingPage() {
                     }}
                   >
                     <div className="flex items-center space-x-2">
-                      <Activity className="w-4 h-4 text-purple-400 animate-pulse" />
+                      <Activity
+  className="w-4 h-4 animate-pulse"
+  style={{
+    color: "var(--color-primary)",
+  }}
+/>
                       <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
                         Generates 20 Recruiter Keywords
                       </span>
                     </div>
-                    <span className="text-xs font-bold text-indigo-400 flex items-center">
+                    <span
+                    className="text-xs font-bold flex items-center"
+                    style={{
+                    color:"var(--color-primary)"
+                    }}
+                    >
                       Generate Roadmap <ChevronRight className="w-3 h-3 ml-0.5" />
                     </span>
                   </div>
@@ -340,12 +383,23 @@ export default function MarketingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {workflowSteps.map((step, idx) => (
-                <Card key={idx} hoverEffect={true} glowColor="#6366f1">
+                <Card key={idx} hoverEffect={true} glowColor="var(--color-primary)">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <span className="text-4xl font-black text-indigo-500/30 select-none font-mono">
+                    <span
+                    className="text-4xl font-black select-none font-mono"
+                    style={{
+                    color:"rgba(var(--color-primary-rgb),0.30)"
+                    }}
+                    >
                       {step.num}
                     </span>
-                    <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400">
+                    <div
+                    className="p-1.5 rounded-lg"
+                    style={{
+                    backgroundColor:"rgba(var(--color-primary-rgb),0.10)",
+                    color:"var(--color-primary)"
+                    }}
+                    >
                       <Check className="w-4 h-4" />
                     </div>
                   </CardHeader>
@@ -369,7 +423,12 @@ export default function MarketingPage() {
           className="py-24 border-t relative"
           style={{ borderColor: 'var(--border-subtle)' }}
         >
-          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-purple-600/5 rounded-full blur-[80px] pointer-events-none" />
+          <div
+  className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full blur-[80px] pointer-events-none"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.05)",
+  }}
+/>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
@@ -387,9 +446,15 @@ export default function MarketingPage() {
               {features.map((feature, idx) => {
                 const Icon = feature.icon;
                 return (
-                  <Card key={idx} hoverEffect={true} glowColor="#a855f7">
+                  <Card key={idx} hoverEffect={true} glowColor="var(--color-primary)">
                     <CardHeader className="flex flex-row items-center space-x-3.5 pb-2">
-                      <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400">
+                      <div
+                      className="p-3 rounded-xl"
+                      style={{
+                      backgroundColor:"rgba(var(--color-primary-rgb),0.10)",
+                      color:"var(--color-primary)"
+                      }}
+                      >
                         <Icon className="w-5 h-5" />
                       </div>
                       <CardTitle className="text-base font-bold">{feature.title}</CardTitle>
@@ -429,7 +494,13 @@ export default function MarketingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 
               {/* Free Plan */}
-              <Card hoverEffect={true} className="text-left flex flex-col justify-between">
+              <Card
+  hoverEffect={true}
+  className="text-left flex flex-col justify-between"
+  style={{
+    borderColor: "rgba(var(--color-primary-rgb),0.20)"
+  }}
+>
                 <CardHeader>
                   <Badge variant="default" className="w-fit mb-3">Free Pilot</Badge>
                   <CardTitle className="text-3xl font-extrabold">$0</CardTitle>
@@ -470,9 +541,11 @@ export default function MarketingPage() {
               {/* Premium Plan */}
               <Card
                 hoverEffect={true}
-                glowColor="#8b5cf6"
+                glowColor="var(--color-primary)"
                 className="text-left flex flex-col justify-between relative"
-                style={{ borderColor: 'rgba(99,102,241,0.35)' }}
+                style={{
+borderColor:"rgba(var(--color-primary-rgb),0.35)"
+}}
               >
                 <div className="absolute top-0 right-8 -translate-y-1/2">
                   <Badge variant="glow">Best Career Acceleration</Badge>
@@ -490,30 +563,55 @@ export default function MarketingPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="h-px my-2" style={{ backgroundColor: 'rgba(99,102,241,0.15)' }} />
+                  <div className="h-px my-2" style={{ backgroundColor:"rgba(var(--color-primary-rgb),0.15)" }} />
                   <ul className="space-y-3 text-xs sm:text-sm" style={{ color: 'var(--text-secondary)' }}>
                     <li className="flex items-center space-x-2.5">
-                      <Check className="w-4.5 h-4.5 text-indigo-400 shrink-0 animate-bounce" />
+                    <Check
+  className="w-4.5 h-4.5 shrink-0"
+  style={{
+    color: "var(--color-primary)"
+  }}
+/>
                       <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                         Unlimited Project Recommendations
                       </span>
                     </li>
                     <li className="flex items-center space-x-2.5">
-                      <Check className="w-4.5 h-4.5 text-indigo-400 shrink-0" />
+                    <Check
+  className="w-4.5 h-4.5 shrink-0"
+  style={{
+    color: "var(--color-primary)"
+  }}
+/>
                       <span>Full Custom Day-by-Day Roadmaps</span>
                     </li>
                     <li className="flex items-center space-x-2.5">
-                      <Check className="w-4.5 h-4.5 text-indigo-400 shrink-0" />
+                    <Check
+  className="w-4.5 h-4.5 shrink-0"
+  style={{
+    color: "var(--color-primary)"
+  }}
+/>
                       <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
                         24/7 AI Mentor Chat with sandbox context
                       </span>
                     </li>
                     <li className="flex items-center space-x-2.5">
-                      <Check className="w-4.5 h-4.5 text-indigo-400 shrink-0" />
+                    <Check
+  className="w-4.5 h-4.5 shrink-0"
+  style={{
+    color: "var(--color-primary)"
+  }}
+/>
                       <span>Recruiter Keyword Booster Sheets</span>
                     </li>
                     <li className="flex items-center space-x-2.5">
-                      <Check className="w-4.5 h-4.5 text-indigo-400 shrink-0" />
+                    <Check
+  className="w-4.5 h-4.5 shrink-0"
+  style={{
+    color: "var(--color-primary)"
+  }}
+/>
                       <span>Docker &amp; Sandbox container templates</span>
                     </li>
                   </ul>
@@ -563,7 +661,11 @@ export default function MarketingPage() {
                       <span className="text-sm sm:text-base">{faq.q}</span>
                       <ChevronDown
                         className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                        style={{ color: isOpen ? '#6366f1' : 'var(--text-muted)' }}
+                        style={{
+                        color:isOpen
+                        ? "var(--color-primary)"
+                        : "var(--text-muted)"
+                        }}
                       />
                     </button>
 
@@ -603,11 +705,12 @@ export default function MarketingPage() {
           {/* Brand */}
           <div className="flex items-center space-x-3 mb-6 md:mb-0">
             <div
-              className="p-1.5 rounded-lg border text-indigo-400"
-              style={{
-                backgroundColor: 'var(--hover-bg)',
-                borderColor: 'var(--border-medium)',
-              }}
+            className="p-1.5 rounded-lg border"
+            style={{
+            color:"var(--color-primary)",
+            backgroundColor:"rgba(var(--color-primary-rgb),0.10)",
+            borderColor:"rgba(var(--color-primary-rgb),0.25)"
+            }}
             >
               <Compass className="w-5 h-5" />
             </div>
@@ -616,10 +719,53 @@ export default function MarketingPage() {
 
           {/* Nav links */}
           <div className="flex flex-wrap items-center justify-center gap-6 mb-6 md:mb-0">
-            <a href="#features" className="hover:text-indigo-400 transition-colors">Features</a>
-            <a href="#workflow" className="hover:text-indigo-400 transition-colors">How it works</a>
-            <a href="#pricing" className="hover:text-indigo-400 transition-colors">Pricing</a>
-            <a href="/login" className="hover:text-indigo-400 transition-colors">Dashboard Portal</a>
+            <a href="#features" className="transition-colors"
+style={{
+color:"var(--text-secondary)"
+}}
+onMouseEnter={(e)=>{
+e.currentTarget.style.color="var(--color-primary)"
+}}
+onMouseLeave={(e)=>{
+e.currentTarget.style.color="var(--text-secondary)"
+}}>Features</a>
+           <a
+  href="#workflow"
+  className="transition-colors"
+  style={{
+    color: "var(--text-secondary)"
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.color = "var(--color-primary)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.color = "var(--text-secondary)";
+  }}
+>
+  How it works
+</a>
+            <a 
+            href="#pricing" 
+            className="transition-colors"
+style={{
+color:"var(--text-secondary)"
+}}
+onMouseEnter={(e)=>{
+e.currentTarget.style.color="var(--color-primary)"
+}}
+onMouseLeave={(e)=>{
+e.currentTarget.style.color="var(--text-secondary)"
+}}>Pricing</a>
+            <a href="/login" className="transition-colors"
+style={{
+color:"var(--text-secondary)"
+}}
+onMouseEnter={(e)=>{
+e.currentTarget.style.color="var(--color-primary)"
+}}
+onMouseLeave={(e)=>{
+e.currentTarget.style.color="var(--text-secondary)"
+}}>Dashboard Portal</a>
           </div>
 
           {/* Copyright */}

@@ -65,10 +65,20 @@ export function EmptyState({
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-70"
         aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.15), transparent 38%), radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08), transparent 35%)',
-        }}
+       style={{
+  background: `
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(var(--color-primary-rgb),0.15),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(var(--color-primary-rgb),0.06),
+      transparent 35%
+    )
+  `,
+}}
       />
 
       <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center">
@@ -78,11 +88,12 @@ export function EmptyState({
           </div>
         ) : icon ? (
           <div
-            className="mb-7 flex h-20 w-20 items-center justify-center rounded-3xl border shadow-[0_0_35px_rgba(99,102,241,0.14)] sm:h-24 sm:w-24"
+            className="mb-7 flex h-20 w-20 items-center justify-center rounded-3xl border sm:h-24 sm:w-24"
             style={{
               backgroundColor: 'var(--hover-bg)',
               borderColor: 'var(--border-medium)',
-              color: '#818cf8',
+              color: 'var(--color-primary)',
+              boxShadow: '0 0 35px rgba(var(--color-primary-rgb),0.14)',
             }}
             aria-hidden="true"
           >

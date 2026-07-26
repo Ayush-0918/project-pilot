@@ -42,7 +42,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
 
   const handleSignOut = async () => {
     logout();
-    try { await signOut(); } catch(e) {}
+    try {
+  await signOut();
+} catch {
+  // ignore Clerk sign-out errors
+}
     router.push('/');
   };
 
@@ -57,11 +61,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
   ];
 
   return (
-    /*
-     * All hard-coded hex colours replaced with CSS custom-property style
-     * attributes so the sidebar surface flips automatically when the
-     * data-theme attribute on <html> changes.
-     */
     <aside
       className={cn(
         'hidden md:flex flex-col h-screen sticky top-0 border-r transition-all duration-300 z-30',
@@ -78,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
         style={{ borderColor: 'var(--border-subtle)' }}
       >
         <Link href="/dashboard" className="flex items-center space-x-3 group overflow-hidden">
-          <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400 shrink-0">
+          <div className="p-2 accent-bg-hover rounded-xl accent-text shrink-0">
             <Compass className="w-5 h-5" />
           </div>
           {!collapsed && (
@@ -86,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
               className="text-lg font-bold tracking-wider select-none transition-opacity duration-300"
               style={{ color: 'var(--text-primary)' }}
             >
-              Pilot<span className="text-indigo-400">AI</span>
+              Pilot<span className="accent-text">AI</span>
             </span>
           )}
         </Link>
@@ -96,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           aria-expanded={!collapsed}
-          className="p-1.5 rounded-lg border transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="p-1.5 rounded-lg border transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
           style={{
             borderColor: 'var(--border-subtle)',
             color: 'var(--text-secondary)',
@@ -118,18 +117,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex items-center space-x-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+                'flex items-center space-x-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]',
                 isActive
-                  ? 'bg-indigo-600/15 border border-indigo-500/20 text-indigo-400 shadow-[0_0_12px_rgba(99,102,241,0.05)]'
+                  ? 'border accent-border accent-text accent-shadow'
                   : 'border border-transparent'
               )}
-              style={!isActive ? { color: 'var(--text-secondary)' } : {}}
+              style={
+                !isActive
+                 ? { 
+                   backgroundColor: "rgba(var(--color-primary-rgb),0.15)",
+      }
+    : {
+                  color: 'var(--text-secondary)' } }
             >
               <Icon
                 aria-hidden="true"
                 className={cn(
                   'w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-105',
-                  isActive ? 'text-indigo-400' : ''
+                  isActive ? 'accent-text' : ''
                 )}
                 style={!isActive ? { color: 'var(--text-muted)' } : {}}
               />
@@ -166,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
           className={cn('flex items-center space-x-3 p-2 rounded-xl mb-3')}
           style={!collapsed ? { backgroundColor: 'var(--hover-bg)' } : {}}
         >
-          <div className="w-10 h-10 rounded-full overflow-hidden border border-indigo-500/30 flex items-center justify-center bg-indigo-500/10 shrink-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden border accent-border flex items-center justify-center accent-bg-hover shrink-0">
             {displayUser.avatarUrl ? (
               <Image
                 src={displayUser.avatarUrl}
@@ -177,7 +182,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
                 unoptimized={displayUser.avatarUrl.startsWith('data:') || displayUser.avatarUrl.startsWith('blob:')}
               />
             ) : (
-              <UserIcon className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              <UserIcon className="w-5 h-5 accent-text" aria-hidden="true" />
             )}
           </div>
           {!collapsed && (
@@ -202,7 +207,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
           onClick={handleSignOut}
           aria-label="Sign out of account"
           title="Sign out of account"
-          className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium hover:text-rose-300 hover:bg-rose-500/5 transition-all duration-200 w-full group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium hover:text-rose-300 hover:bg-rose-500/5 transition-all duration-200 w-full group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
           style={{ color: 'var(--text-secondary)' }}
         >
           <LogOut className="w-5 h-5 shrink-0" aria-hidden="true" />

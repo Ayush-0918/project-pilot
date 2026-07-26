@@ -477,3 +477,41 @@ div:has(> .cl-devMode) {
 [data-theme="light"] .recharts-polar-grid-concentric path {
   stroke: rgba(99, 102, 241, 0.25) !important;
 }
+
+/* =====================================================
+   ACCENT UTILITIES
+===================================================== */
+
+.accent-text {
+  color: var(--color-primary) !important;
+}
+
+.accent-bg {
+  background-color: var(--color-primary) !important;
+}
+
+.accent-border {
+  border-color: var(--color-primary) !important;
+}
+
+.accent-shadow {
+  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.35);
+}
+
+.accent-glow {
+  box-shadow:
+    0 0 8px rgba(var(--color-primary-rgb), .35),
+    0 0 20px rgba(var(--color-primary-rgb), .20);
+}
+
+.accent-hover:hover {
+  color: var(--color-primary) !important;
+}
+
+.accent-bg-hover:hover {
+  background: rgba(var(--color-primary-rgb), 0.12) !important;
+}
+
+.accent-border-hover:hover {
+  border-color: var(--color-primary) !important;
+}

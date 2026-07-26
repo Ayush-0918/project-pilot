@@ -103,7 +103,11 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
   const handleSignOut = async () => {
     logout();
     onClose();
-    try { await signOut(); } catch (e) {}
+    try {
+  await signOut();
+} catch {
+  // ignore Clerk sign out errors
+}
     router.push('/');
   };
 
@@ -184,14 +188,24 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
               style={{ borderColor: 'var(--border-subtle)' }}
             >
               <Link href="/dashboard" onClick={onClose} className="flex items-center space-x-3">
-                <div className="p-2 bg-indigo-500/15 rounded-2xl text-indigo-400 border border-indigo-500/20 shadow-sm">
+                <div
+  className="p-2 rounded-2xl shadow-sm"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.12)",
+    color: "var(--color-primary)",
+    border: "1px solid rgba(var(--color-primary-rgb),0.2)",
+  }}
+>
                   <Compass className="w-5.5 h-5.5" />
                 </div>
                 <span
                   className="text-lg sm:text-xl font-extrabold tracking-wider select-none"
                   style={{ color: 'var(--text-primary)' }}
                 >
-                  Pilot<span className="text-indigo-400">AI</span>
+                  Pilot
+<span style={{ color: "var(--color-primary)" }}>
+  AI
+</span>
                 </span>
               </Link>
 
@@ -201,7 +215,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
                 aria-label="Close navigation drawer"
                 title="Close navigation drawer"
                 aria-controls="mobile-drawer"
-                className="p-2 rounded-2xl border transition-all cursor-pointer hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="p-2 rounded-2xl border transition-all cursor-pointer hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                 style={{
                   borderColor: 'var(--border-subtle)',
                   color: 'var(--text-secondary)',
@@ -225,20 +239,32 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
                       onClick={onClose}
                       aria-current={isActive ? 'page' : undefined}
                       className={cn(
-                        'flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm sm:text-base font-bold transition-all duration-200 group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-                        isActive
-                          ? 'bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.12)]'
-                          : 'border border-transparent hover:bg-indigo-500/10'
-                      )}
-                      style={!isActive ? { color: 'var(--text-secondary)' } : {}}
+  "flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm sm:text-base font-bold transition-all duration-200 group relative w-full focus:outline-none",
+  isActive
+    ? ""
+    : "border border-transparent"
+)}
+style={
+  isActive
+    ? {
+        backgroundColor: "rgba(var(--color-primary-rgb),0.15)",
+        borderColor: "rgba(var(--color-primary-rgb),0.25)",
+        color: "var(--color-primary)",
+        boxShadow: "0 0 15px rgba(var(--color-primary-rgb),0.15)",
+      }
+    : {
+        color: "var(--text-secondary)",
+      }
+}
                     >
                       <Icon
                         aria-hidden="true"
-                        className={cn(
-                          'w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110',
-                          isActive ? 'text-indigo-400' : ''
-                        )}
-                        style={!isActive ? { color: 'var(--text-muted)' } : {}}
+                        className="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+style={{
+  color: isActive
+    ? "var(--color-primary)"
+    : "var(--text-muted)",
+}}
                       />
                       <span className="truncate">{item.name}</span>
                     </Link>
@@ -259,18 +285,29 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
                 onClick={toggleTheme}
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
                 title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-                className="flex items-center justify-between px-4 py-3 rounded-2xl border text-xs sm:text-sm font-semibold w-full cursor-pointer transition-all hover:bg-indigo-500/5 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex items-center justify-between px-4 py-3 rounded-2xl border text-xs sm:text-sm font-semibold w-full cursor-pointer transition-all  active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
                 style={{
-                  borderColor: 'var(--border-subtle)',
-                  color: 'var(--text-secondary)',
-                  backgroundColor: 'var(--hover-bg)',
-                }}
+  borderColor: "var(--border-subtle)",
+  color: "var(--text-secondary)",
+  backgroundColor: "var(--hover-bg)",
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.backgroundColor =
+    "rgba(var(--color-primary-rgb),0.08)";
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.backgroundColor =
+    "var(--hover-bg)";
+}}
               >
                 <span className="flex items-center space-x-2.5">
                   {theme === 'dark' ? (
                     <Sun className="w-4.5 h-4.5 text-amber-400 animate-pulse" />
                   ) : (
-                    <Moon className="w-4.5 h-4.5 text-indigo-400" />
+                    <Moon
+  className="w-4.5 h-4.5"
+  style={{ color: "var(--color-primary)" }}
+/>
                   )}
                   <span>{theme === 'dark' ? 'Light Theme' : 'Dark Theme'}</span>
                 </span>
@@ -278,10 +315,20 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
 
               {/* User Profile Card */}
               <div
-                className="flex items-center space-x-3 p-3 rounded-2xl border border-indigo-500/10"
-                style={{ backgroundColor: 'var(--hover-bg)' }}
+                className="flex items-center space-x-3 p-3 rounded-2xl border"
+style={{
+  backgroundColor: "var(--hover-bg)",
+  borderColor: "rgba(var(--color-primary-rgb),0.12)",
+}}
+              
               >
-                <div className="w-9.5 h-9.5 rounded-full overflow-hidden border border-indigo-500/30 flex items-center justify-center bg-indigo-500/10 shrink-0">
+                <div
+  className="w-9.5 h-9.5 rounded-full overflow-hidden border flex items-center justify-center shrink-0"
+  style={{
+    borderColor: "rgba(var(--color-primary-rgb),0.25)",
+    backgroundColor: "rgba(var(--color-primary-rgb),0.10)",
+  }}
+>
                   {displayUser.avatarUrl ? (
                     <Image
                       src={displayUser.avatarUrl}
@@ -292,7 +339,10 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
                       unoptimized={displayUser.avatarUrl.startsWith('data:') || displayUser.avatarUrl.startsWith('blob:')}
                     />
                   ) : (
-                    <UserIcon className="w-4.5 h-4.5 text-indigo-400" />
+                    <UserIcon
+  className="w-4.5 h-4.5"
+  style={{ color: "var(--color-primary)" }}
+/>
                   )}
                 </div>
                 <div className="truncate flex-1">

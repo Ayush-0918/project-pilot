@@ -1,27 +1,59 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight, Compass, Sun, Moon } from 'lucide-react';
+import { Menu, X, ArrowRight, Compass, Sun, Moon, Check } from "lucide-react";
 import { Button } from '../ui/Button';
 import { useAppStore } from '@/store/useAppStore';
 import { useTheme } from '@/lib/ThemeProvider';
+import { ACCENT_THEMES, AccentTheme } from "@/store/slices/themeSlice";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+
+  const themeMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { signOut } = useClerk();
   const { isAuthenticated, logout } = useAppStore();
   // Theme toggle available on the marketing navbar as well
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme, accentTheme, setAccentTheme } = useTheme();
+
+  useEffect(() => {
+  function handleClickOutside(e: MouseEvent) {
+    if (
+      themeMenuRef.current &&
+      !themeMenuRef.current.contains(
+        e.target as Node
+      )
+    ) {
+      setThemeMenuOpen(false);
+    }
+  }
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () =>
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+}, []);
 
   const handleSignOut = async () => {
     logout();
     setIsOpen(false);
-    try { await signOut(); } catch(e) {}
+    try {
+  await signOut();
+} catch {
+  // ignore Clerk sign-out errors
+}
     router.push('/');
   };
 
@@ -44,14 +76,28 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group relative">
-            <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400 group-hover:scale-110 group-hover:text-indigo-300 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+            <div
+  className="p-2 rounded-xl group-hover:scale-110 transition-all duration-300"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.12)",
+    color: "var(--color-primary)",
+    boxShadow: "0 0 15px rgba(var(--color-primary-rgb),0.25)",
+  }}
+>
               <Compass className="w-6 h-6 animate-pulse" />
             </div>
             <span
               className="text-xl font-bold tracking-wider select-none"
               style={{ color: 'var(--text-primary)' }}
             >
-              ProjectPilot <span className="text-indigo-400">AI</span>
+              ProjectPilot{" "}
+<span
+  style={{
+    color: "var(--color-primary)",
+  }}
+>
+  AI
+</span>
             </span>
           </Link>
 
@@ -59,13 +105,26 @@ export const Navbar = () => {
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <a
-                key={link.name}
-                href={link.href}
-                className="text-sm hover:text-indigo-400 transition-colors duration-200 relative group font-medium"
-                style={{ color: 'var(--text-secondary)' }}
-              >
+  key={link.name}
+  href={link.href}
+  className="text-sm duration-200 relative group font-medium"
+  style={{
+    color: "var(--text-secondary)",
+  }}
+  onMouseEnter={(e) =>
+    (e.currentTarget.style.color = "var(--color-primary)")
+  }
+  onMouseLeave={(e) =>
+    (e.currentTarget.style.color = "var(--text-secondary)")
+  }
+>
                 {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all duration-300 group-hover:w-full" />
+                <span
+  className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+  style={{
+    backgroundColor: "var(--color-primary)",
+  }}
+/>
               </a>
             ))}
           </nav>
@@ -73,22 +132,130 @@ export const Navbar = () => {
           {/* Right Action buttons */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Theme toggle — available on the marketing page too */}
-            <button
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-              className="p-2 rounded-xl border transition-colors cursor-pointer"
-              style={{
-                borderColor: 'var(--border-subtle)',
-                color: 'var(--text-secondary)',
-              }}
-            >
-              {theme === 'dark'
-                ? <Sun className="w-4 h-4 text-amber-400" />
-                : <Moon className="w-4 h-4 text-indigo-400" />
-              }
-            </button>
+            <div className="relative" ref={themeMenuRef}>
+  <button
+    onClick={() => setThemeMenuOpen((v) => !v)}
+    aria-label="Theme Customizer"
+    className="p-2 rounded-xl border transition-colors cursor-pointer"
+    style={{
+      borderColor: "var(--border-subtle)",
+      color: "var(--text-secondary)",
+    }}
+  >
+    {theme === "dark" ? (
+      <Sun className="w-4 h-4 text-amber-400" />
+    ) : (
+      <Moon className="w-4 h-4" style={{ color: "var(--color-primary)" }} />
+    )}
+  </button>
 
-            {isAuthenticated ? (
+  <AnimatePresence>
+    {themeMenuOpen && (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 8 }}
+        className="absolute right-0 mt-3 w-72 rounded-2xl border backdrop-blur-xl p-4 z-50"
+        style={{
+  backgroundColor: "var(--surface-elevated)",
+  borderColor: "var(--border-medium)",
+}}
+      >
+        <div className="space-y-4">
+
+  <div>
+    <h3
+      className="text-sm font-semibold"
+      style={{ color: "var(--text-primary)" }}
+    >
+      Theme
+    </h3>
+
+    <div className="mt-3 space-y-2">
+
+      <button
+        onClick={() => setTheme("light")}
+        className={`w-full flex items-center justify-between rounded-xl px-3 py-2 transition ${
+          theme === "light" ? "bg-white/10" : "hover:bg-white/5"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <Sun className="w-4 h-4 text-amber-400" />
+          <span>Light Mode</span>
+        </div>
+
+        {theme === "light" && (
+          <Check className="w-4 h-4 text-green-400" />
+        )}
+      </button>
+
+      <button
+        onClick={() => setTheme("dark")}
+        className={`w-full flex items-center justify-between rounded-xl px-3 py-2 transition ${
+          theme === "dark" ? "bg-white/10" : "hover:bg-white/5"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <Moon className="w-4 h-4 accent-text" />
+          <span>Dark Mode</span>
+        </div>
+
+        {theme === "dark" && (
+          <Check className="w-4 h-4 text-green-400" />
+        )}
+      </button>
+
+    </div>
+  </div>
+
+  <div
+    className="border-t pt-4"
+    style={{ borderColor: "var(--border-subtle)" }}
+  >
+    <h3
+      className="text-sm font-semibold mb-3"
+      style={{ color: "var(--text-primary)" }}
+    >
+      Accent Colours
+    </h3>
+
+    <div className="flex items-center justify-between">
+
+      {(Object.entries(ACCENT_THEMES) as [
+        AccentTheme,
+        string
+      ][]).map(([name, colour]) => (
+
+        <button
+          key={name}
+          aria-label={name}
+          onClick={() => setAccentTheme(name)}
+          className={`relative h-9 w-9 rounded-full transition-transform hover:scale-110 ${
+            accentTheme === name
+              ? "ring-2 ring-white ring-offset-2 ring-offset-black"
+              : ""
+          }`}
+          style={{
+            backgroundColor: colour,
+          }}
+        >
+          {accentTheme === name && (
+            <Check className="absolute inset-0 m-auto w-4 h-4 text-white" />
+          )}
+        </button>
+
+      ))}
+
+    </div>
+  </div>
+
+</div>
+      </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {isAuthenticated ? (
               <>
                 <Link href="/dashboard">
                   <Button variant="glow" size="sm">
@@ -119,20 +286,38 @@ export const Navbar = () => {
           <div className="md:hidden flex items-center space-x-2">
             {/* Mobile theme toggle */}
             <button
-              onClick={toggleTheme}
+              onClick={() =>
+                setTheme(theme === "dark" ? "light" : "dark")
+              }
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
               className="p-2 cursor-pointer"
-              style={{ color: 'var(--text-secondary)' }}
+              style={{
+  color: "var(--text-secondary)",
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.color = "var(--color-primary)";
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.color = "var(--text-secondary)";
+}}
             >
               {theme === 'dark'
                 ? <Sun className="w-5 h-5 text-amber-400" />
-                : <Moon className="w-5 h-5 text-indigo-400" />
+                : <Moon className="w-5 h-5 accent-text" />
               }
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 focus:outline-none cursor-pointer"
-              style={{ color: 'var(--text-secondary)' }}
+              style={{
+  color: "var(--text-secondary)",
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.color = "var(--color-primary)";
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.color = "var(--text-secondary)";
+}}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -157,7 +342,15 @@ export const Navbar = () => {
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className="block text-base font-semibold px-3 py-2 rounded-xl transition-colors"
-                  style={{ color: 'var(--text-secondary)' }}
+                  style={{
+  color: "var(--text-secondary)",
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.color = "var(--color-primary)";
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.color = "var(--text-secondary)";
+}}
                 >
                   {link.name}
                 </a>

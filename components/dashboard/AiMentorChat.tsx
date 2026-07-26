@@ -108,23 +108,56 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-96 items-center justify-center bg-[#090620] rounded-2xl border border-white/10">
-        <Loader2 className="h-6 w-6 animate-spin text-indigo-400" />
+      <div
+  className="flex h-96 items-center justify-center rounded-2xl border"
+  style={{
+    backgroundColor: "var(--surface-primary)",
+    borderColor: "var(--border-subtle)",
+  }}
+>
+        <Loader2
+  className="h-6 w-6 animate-spin"
+  style={{ color: "var(--color-primary)" }}
+/>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-[650px] rounded-2xl border border-white/10 bg-[#090620] shadow-2xl overflow-hidden">
+    <div
+  className="flex flex-col h-[650px] rounded-2xl border shadow-2xl overflow-hidden"
+  style={{
+    backgroundColor: "var(--surface-primary)",
+    borderColor: "var(--border-subtle)",
+  }}
+>
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 bg-white/[0.02]">
+      <div
+  className="flex items-center justify-between border-b px-6 py-4"
+  style={{
+    borderColor: "var(--border-subtle)",
+    backgroundColor: "var(--surface-secondary)",
+  }}
+>
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-indigo-500/20 p-2 text-indigo-300">
+          <div
+  className="rounded-xl p-2"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.15)",
+    color: "var(--color-primary)",
+  }}
+>
             <Bot className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-white">AI Mentor Workspace</h2>
-            <p className="text-xs text-slate-400">Context-aware career & code guidance</p>
+            <h2
+  className="text-sm font-semibold"
+  style={{ color: "var(--text-primary)" }}
+>AI Mentor Workspace</h2>
+            <p
+  className="text-xs"
+  style={{ color: "var(--text-secondary)" }}
+>Context-aware career & code guidance</p>
           </div>
         </div>
         <button
@@ -140,11 +173,29 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-10">
-            <div className="rounded-2xl bg-white/5 p-4 mb-3">
-              <Bot className="h-8 w-8 text-indigo-400" />
+            <div
+  className="rounded-2xl p-4 mb-3"
+  style={{
+    backgroundColor: "var(--hover-bg)",
+  }}
+>
+              <Bot
+  className="h-8 w-8"
+  style={{ color: "var(--color-primary)" }}
+/>
             </div>
-            <p className="text-sm font-semibold text-white">Start a conversation with your AI Mentor</p>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm">
+            <p
+  className="text-sm font-semibold"
+  style={{
+    color: "var(--text-primary)",
+  }}
+>Start a conversation with your AI Mentor</p>
+            <p
+  className="text-xs mt-1 max-w-sm"
+  style={{
+    color: "var(--text-secondary)",
+  }}
+>
               Ask for architectural feedback, debugging assistance, or a custom study roadmap. Your history is securely saved across sessions.
             </p>
           </div>
@@ -159,18 +210,38 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
               <div
                 className={`rounded-xl p-2 shrink-0 ${
                   m.role === 'user'
-                    ? 'bg-indigo-600 text-white'
+                    ? ''
                     : 'bg-white/10 text-indigo-300'
+
                 }`}
+                style={
+  m.role === "user"
+    ? {
+        backgroundColor: "var(--color-primary)",
+        color: "#fff",
+      }
+    : {
+        backgroundColor: "var(--hover-bg)",
+        color: "var(--color-primary)",
+      }
+}
               >
                 {m.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
               </div>
               <div
                 className={`rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed ${
                   m.role === 'user'
-                    ? 'bg-indigo-600 text-white rounded-tr-none'
+                    ? 'rounded-tr-none'
                     : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
                 }`}
+                style={
+  m.role === "user"
+    ? {
+        backgroundColor: "var(--color-primary)",
+        color: "#fff",
+      }
+    : undefined
+}
               >
                 {m.content}
               </div>
@@ -181,19 +252,50 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 bg-white/[0.02] flex gap-2">
+      <form
+  onSubmit={handleSendMessage}
+  className="border-t p-4 flex gap-2"
+  style={{
+    borderColor: "var(--border-subtle)",
+    backgroundColor: "var(--surface-secondary)",
+  }}
+>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your AI mentor anything..."
           disabled={isSending}
-          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 disabled:opacity-50"
+          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:ring-1 disabled:opacity-50"
+          style={{
+  backgroundColor: "var(--input-bg)",
+  color: "var(--text-primary)",
+  border: "1px solid var(--input-border)",
+}}
+onFocus={(e) => {
+  e.currentTarget.style.borderColor = "rgba(var(--color-primary-rgb),0.5)";
+  e.currentTarget.style.boxShadow =
+    "0 0 0 1px rgba(var(--color-primary-rgb),0.4)";
+}}
+
+onBlur={(e) => {
+  e.currentTarget.style.borderColor = "var(--input-border)";
+  e.currentTarget.style.boxShadow = "none";
+}}
         />
         <button
           type="submit"
           disabled={isSending || !input.trim()}
-          className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white transition disabled:opacity-50"
+style={{
+  backgroundColor: "var(--color-primary)",
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.filter = "brightness(1.08)";
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.filter = "brightness(1)";
+}}
         >
           {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </button>

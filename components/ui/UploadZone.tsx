@@ -101,23 +101,46 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full glass-panel border-emerald-500/30 p-5 rounded-2xl flex items-center justify-between"
+            className="w-full glass-panel p-5 rounded-2xl flex items-center justify-between"
+style={{
+  border: "1px solid rgba(16,185,129,0.30)",
+}}
           >
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400">
+              <div className="p-3 rounded-xl"
+style={{
+  backgroundColor: "rgba(16,185,129,0.10)",
+  color: "#34d399",
+}}>
                 <FileText className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-slate-200 line-clamp-1">{fileName}</h4>
-                <p className="text-xs text-slate-400">Resume uploaded successfully</p>
+                <h4 className="text-sm font-semibold line-clamp-1"
+style={{ color: "var(--text-primary)" }}>{fileName}</h4>
+                <p className="text-xs"
+style={{ color: "var(--text-muted)" }}>Resume uploaded successfully</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              <CheckCircle
+  className="w-5 h-5"
+  style={{ color: "#34d399" }}
+/>
               <button
                 type="button"
                 onClick={clearFile}
-                className="p-1 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="p-1 rounded-lg transition-colors cursor-pointer"
+style={{
+  color: "var(--text-muted)",
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+  e.currentTarget.style.color = "var(--text-primary)";
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.backgroundColor = "transparent";
+  e.currentTarget.style.color = "var(--text-muted)";
+}}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -133,25 +156,51 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
             onClick={() => fileInputRef.current?.click()}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
-            className={cn(
-              'w-full glass-panel border-dashed border-2 p-8 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300',
-              isDragActive 
-                ? 'border-indigo-500 bg-indigo-500/5' 
-                : 'border-white/10 hover:border-white/20 hover:bg-white/2'
-            )}
+            className="w-full glass-panel border-dashed border-2 p-8 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-300"
+style={{
+  borderColor: isDragActive
+    ? "var(--color-primary)"
+    : "var(--border-subtle)",
+  backgroundColor: isDragActive
+    ? "rgba(var(--color-primary-rgb),0.05)"
+    : "transparent",
+}}
+onMouseEnter={(e) => {
+  if (!isDragActive) {
+    e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+    e.currentTarget.style.borderColor = "var(--border-medium)";
+  }
+}}
+onMouseLeave={(e) => {
+  if (!isDragActive) {
+    e.currentTarget.style.backgroundColor = "transparent";
+    e.currentTarget.style.borderColor = "var(--border-subtle)";
+  }
+}}
           >
             <div className={cn(
-              'p-4 rounded-full mb-4 transition-all duration-300',
-              isDragActive 
-                ? 'bg-indigo-500/20 text-indigo-400 scale-110' 
-                : 'bg-white/5 text-slate-400'
-            )}>
+  "p-4 rounded-full mb-4 transition-all duration-300",
+  isDragActive && "scale-110"
+)}
+style={{
+  backgroundColor: isDragActive
+    ? "rgba(var(--color-primary-rgb),0.20)"
+    : "var(--hover-bg)",
+  color: isDragActive
+    ? "var(--color-primary)"
+    : "var(--text-muted)",
+}}>
               <Upload className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mb-1">
-              Drag and drop your resume here, or <span className="text-indigo-400 hover:underline">browse</span>
+            <h3 className="text-sm font-semibold mb-1"
+style={{ color: "var(--text-primary)" }}>
+              Drag and drop your resume here, or <span
+  style={{ color: "var(--color-primary)" }}
+  className="hover:underline"
+>browse</span>
             </h3>
-            <p className="text-xs text-slate-400 mb-2">
+            <p className="text-xs mb-2"
+style={{ color: "var(--text-muted)" }}>
               Supported formats: {acceptedTypes.join(', ')} (Max {maxSizeMB}MB)
             </p>
             {error && (
