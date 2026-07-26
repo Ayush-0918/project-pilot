@@ -17,10 +17,11 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Progress } from "@/components/ui/Progress";
-import Tooltip from "@/components/ui/Tooltip";
-import { useAppStore } from "@/store/useAppStore";
 import { TiltWrapper } from "@/components/ui/TiltWrapper";
-import { useClerk, useUser } from "@clerk/nextjs";
+import Tooltip from "@/components/ui/Tooltip";
+import { generateAdaptiveDashboard } from "@/lib/adaptiveEngine";
+import { useAppStore } from "@/store/useAppStore";
+import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -33,7 +34,6 @@ import {
   Info,
   Sparkles,
 } from "lucide-react";
-import { generateAdaptiveDashboard } from "@/lib/adaptiveEngine";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
