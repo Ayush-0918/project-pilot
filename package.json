@@ -39,6 +39,7 @@
     "react-markdown": "^10.1.0",
     "recharts": "^3.8.1",
     "sonner": "^2.0.7",
+    "stripe": "^22.3.2",
     "svix": "^1.93.0",
     "tailwind-merge": "^3.6.0",
     "uploadthing": "^7.7.4",
