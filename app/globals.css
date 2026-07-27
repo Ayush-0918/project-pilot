@@ -477,38 +477,40 @@ div:has(> .cl-devMode) {
 [data-theme="light"] .recharts-polar-grid-concentric path {
   stroke: rgba(99, 102, 241, 0.25) !important;
 }
-/* ─────────────────────────────────────────────────
-   PRINT OPTIMIZATIONS (A4 Resume / PDF Export)
-───────────────────────────────────────────────── */
-@media print {
-  @page {
-    size: A4;
-    margin: 15mm;
-  }
-  header, .no-print, button {
-    display: none !important;
-  }
-  body, .min-h-screen {
-    background-color: #ffffff !important;
-    color: #1e293b !important;
-  }
-  section {
-    break-inside: avoid;
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: none !important;
-    color: #1e293b !important;
-    margin-bottom: 1rem;
-    padding: 1rem !important;
-  }
-  h1, h2, h3, p, span {
-    color: #0f172a !important;
-  }
-  .text-slate-300, .text-slate-400, .text-slate-500 {
-    color: #475569 !important;
-  }
-  .bg-white\/5, .bg-indigo-950\/40 {
-    background-color: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-  }
+
+/* =====================================================
+   ACCENT UTILITIES
+
+.accent-text {
+  color: var(--color-primary) !important;
+}
+
+.accent-bg {
+  background-color: var(--color-primary) !important;
+}
+
+.accent-border {
+  border-color: var(--color-primary) !important;
+}
+
+.accent-shadow {
+  box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.35);
+}
+
+.accent-glow {
+  box-shadow:
+    0 0 8px rgba(var(--color-primary-rgb), .35),
+    0 0 20px rgba(var(--color-primary-rgb), .20);
+}
+
+.accent-hover:hover {
+  color: var(--color-primary) !important;
+}
+
+.accent-bg-hover:hover {
+  background: rgba(var(--color-primary-rgb), 0.12) !important;
+}
+
+.accent-border-hover:hover {
+  border-color: var(--color-primary) !important;
 }

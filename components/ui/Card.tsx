@@ -26,8 +26,11 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         >
           {glowColor && (
             <div
-              className="absolute -top-12 -right-12 w-36 h-36 rounded-full blur-[60px] opacity-10 pointer-events-none"
-              style={{ backgroundColor: glowColor }}
+              className="absolute top-1/2 left-1/2 w-72 h-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[90px] opacity-10 pointer-events-none"
+              style={{
+  backgroundColor:
+    glowColor ?? "rgba(var(--color-primary-rgb),0.25)",
+}}
             />
           )}
           {children}
@@ -45,12 +48,22 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         )}
         {...props}
       >
-        {glowColor && (
-          <div
-            className="absolute -top-12 -right-12 w-36 h-36 rounded-full blur-[60px] opacity-10 pointer-events-none"
-            style={{ backgroundColor: glowColor }}
-          />
-        )}
+       {glowColor && (
+  <>
+    <div
+      className="absolute -top-12 -left-12 w-36 h-36 rounded-full blur-[60px] opacity-10 pointer-events-none"
+      style={{
+        backgroundColor: glowColor,
+      }}
+    />
+    <div
+      className="absolute -bottom-12 -right-12 w-36 h-36 rounded-full blur-[60px] opacity-10 pointer-events-none"
+      style={{
+        backgroundColor: glowColor,
+      }}
+    />
+  </>
+)}
         {children}
       </div>
     );

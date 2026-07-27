@@ -17,6 +17,10 @@ import type { Theme } from '@/lib/ThemeProvider';
 import { useTheme } from '@/lib/ThemeProvider';
 import { useAppStore } from '@/store/useAppStore';
 import {
+  ACCENT_THEMES,
+  AccentTheme,
+} from '@/store/slices/themeSlice';
+import {
   AlertCircle,
   Camera,
   Check,
@@ -36,7 +40,7 @@ import {
   Trash2,
   Upload,
   User as UserIcon,
-  X
+  X,
 } from 'lucide-react';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
@@ -54,7 +58,9 @@ export default function SettingsPage() {
     connectGithub,
     disconnectGithub,
     updateUserSkills,
-    updateProfessionalLinks: updateLinksStore
+    updateProfessionalLinks: updateLinksStore,
+    accentTheme,
+    setAccentTheme,
   } = useAppStore();
 
   // Access the global theme state & setTheme so the user can pick directly
@@ -807,6 +813,82 @@ export default function SettingsPage() {
         </div>
 
         {/* Right Column: Connection accounts & Operations configs */}
+        <Card hoverEffect={false}>
+  <CardHeader>
+    <CardTitle className="text-base font-bold flex items-center gap-2">
+      <Sparkles className="w-4 h-4 text-indigo-400" />
+      Appearance
+    </CardTitle>
+
+    <CardDescription className="text-xs">
+      Customize the look and feel of Project Pilot.
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent className="space-y-6">
+    <div>
+      <p className="text-xs font-semibold mb-3 text-slate-300">
+        Theme
+      </p>
+
+      <div className="grid grid-cols-2 gap-3">
+        {themeOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => setTheme(option.value)}
+            className={`rounded-xl border p-4 transition-all text-left ${
+              theme === option.value
+                ? "border-indigo-500 bg-indigo-500/10"
+                : "border-white/10 hover:border-white/20"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              {option.icon}
+
+              <span className="font-semibold">
+                {option.label}
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-400">
+              {option.description}
+            </p>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div>
+      <p className="text-xs font-semibold mb-3 text-slate-300">
+        Accent Colour
+      </p>
+
+      <div className="flex flex-wrap gap-3">
+        {(Object.keys(
+          ACCENT_THEMES
+        ) as AccentTheme[]).map((accent) => (
+          <button
+            key={accent}
+            onClick={() =>
+              useAppStore
+                .getState()
+                .setAccentTheme(accent)
+            }
+            className={`w-10 h-10 rounded-full border-2 transition-all ${
+              accentTheme === accent
+                ? "border-white scale-110"
+                : "border-transparent hover:scale-105"
+            }`}
+            style={{
+              backgroundColor:
+                ACCENT_THEMES[accent],
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  </CardContent>
+</Card>
         <div className="space-y-8">
 
           {/* ─── CONNECTED ACCOUNTS ───────────────────────── */}

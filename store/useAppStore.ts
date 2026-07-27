@@ -20,6 +20,7 @@ import { createProjectSlice, ProjectSlice } from "./slices/projectSlice";
 import { createChatSlice, ChatSlice } from "./slices/chatSlice";
 import { createGithubSlice, GithubSlice } from "./slices/githubSlice";
 import { createCareerSlice, CareerSlice } from "./slices/careerSlice";
+import { createThemeSlice, ThemeSlice } from "./slices/themeSlice";
 
 // Neutral placeholder used before the authenticated user profile is hydrated from the DB.
 // This is intentionally empty — real data flows in via syncUserProfile() on mount.
@@ -273,7 +274,8 @@ export interface AppStore
     ProjectSlice,
     ChatSlice,
     GithubSlice,
-    CareerSlice {
+    CareerSlice,
+    ThemeSlice {
   // Onboarding State
   onboardingData: OnboardingData;
   onboardingStep: number;
@@ -305,4 +307,5 @@ export const useAppStore = create<AppStore>()((set, get, api) => ({
 )(set, get, api),
   ...createGithubSlice(MOCK_GITHUB)(set, get, api),
   ...createCareerSlice(MOCK_CAREER)(set, get, api),
+  ...createThemeSlice(set, get, api),
 }));

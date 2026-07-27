@@ -53,9 +53,20 @@ export function CustomCursor() {
       }}
     >
       {/* Soft outer glow */}
-      <div className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-indigo-400/40 blur-md" />
+      <div
+  className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full blur-md"
+  style={{
+    backgroundColor: "rgba(var(--color-primary-rgb),0.40)",
+  }}
+/>
       {/* Bright core dot */}
-      <div className="absolute -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-300 shadow-[0_0_12px_4px_rgba(99,102,241,0.6)]" />
+      <div
+  className="absolute -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
+  style={{
+    backgroundColor: "var(--color-primary)",
+    boxShadow: "0 0 12px 4px rgba(var(--color-primary-rgb),0.6)",
+  }}
+/>
     </motion.div>
   );
 }
