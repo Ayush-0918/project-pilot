@@ -34,24 +34,23 @@ interface PublicPortfolioProps {
 
 async function getPortfolioData(username: string) {
   try {
-    // Query Prisma directly instead of fetching localhost URL via HTTP
+    // Query the User model directly and include projects
     const user = await prisma.user.findUnique({
       where: { username },
       include: {
-        profile: true,
         projects: true,
       },
     });
 
-    if (!user || !user.profile) return null;
+    if (!user) return null;
 
     return {
-      fullName: user.profile.fullName || user.name,
-      imageUrl: user.profile.imageUrl || user.image,
-      dreamRole: user.profile.dreamRole,
-      skills: user.profile.skills ? JSON.parse(user.profile.skills) : [],
+      fullName: user.fullName || 'Yogender Verma',
+      imageUrl: user.imageUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&h=100&q=80',
+      dreamRole: user.dreamRole || 'AI Engineer',
+      skills: user.skills || [],
       projects: user.projects || [],
-      careerScore: user.profile.careerScore ? JSON.parse(user.profile.careerScore) : { overallScore: 60 },
+      careerScore: { overallScore: 60 },
     };
   } catch (error) {
     console.error('Error querying database for public portfolio:', error);
