@@ -112,8 +112,9 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPro
           </Badge>
         </Link>
 
-      {/* Render interactive buttons via Client Component */}
-<ProfileActions profileData={dbProfile} />
+        {/* Render interactive buttons via Client Component */}
+        <ProfileActions profileData={dbProfile} />
+      </header>
 
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-4 sm:px-8 py-10 space-y-10">
