@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
 import { CustomCursor } from '@/components/ui/CustomCursor';
 import {
   User as UserIcon,
@@ -14,21 +15,15 @@ import {
   Code2,
   GitBranch,
   Star,
-  Share2,
-  Copy,
-  Check,
   ArrowLeft,
   Calendar,
   Layers,
-  ChevronRight,
-  Sun,
-  Moon,
-  Printer
+  ChevronRight
 } from 'lucide-react';
-import { Github, Linkedin } from '@/components/ui/BrandIcons';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import ProfileActions from './ProfileActions'; // Import the client actions component
 
 // Enable Incremental Static Regeneration (ISR) - revalidate every 60 seconds
 export const revalidate = 60;
@@ -39,15 +34,27 @@ interface PublicPortfolioProps {
 
 async function getPortfolioData(username: string) {
   try {
-    // Fetch directly from your database or internal API with ISR cache options
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/public/${encodeURIComponent(username)}`, {
-      next: { revalidate: 60 },
+    // Query Prisma directly instead of fetching localhost URL via HTTP
+    const user = await prisma.user.findUnique({
+      where: { username },
+      include: {
+        profile: true,
+        projects: true,
+      },
     });
-    if (!res.ok) return null;
-    return await res.json();
+
+    if (!user || !user.profile) return null;
+
+    return {
+      fullName: user.profile.fullName || user.name,
+      imageUrl: user.profile.imageUrl || user.image,
+      dreamRole: user.profile.dreamRole,
+      skills: user.profile.skills ? JSON.parse(user.profile.skills) : [],
+      projects: user.projects || [],
+      careerScore: user.profile.careerScore ? JSON.parse(user.profile.careerScore) : { overallScore: 60 },
+    };
   } catch (error) {
-    console.error('Error fetching public portfolio:', error);
+    console.error('Error querying database for public portfolio:', error);
     return null;
   }
 }
@@ -88,14 +95,11 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPro
   const careerGoal = dbProfile?.dreamRole || 'AI Engineer';
   const userSkills = dbProfile?.skills || ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'FastAPI', 'Python'];
   const userProjects = dbProfile?.projects || [];
-  const githubAnalytics = dbProfile?.githubAnalytics;
   const careerScore = dbProfile?.careerScore;
 
   return (
     <div className="min-h-screen bg-[#070514] text-slate-100 selection:bg-indigo-500 selection:text-white print:bg-white print:text-slate-900">
       <CustomCursor />
-
-      
 
       {/* Top Glassmorphic Navigation Bar */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#070514]/80 border-b border-white/10 px-4 sm:px-8 py-3 flex items-center justify-between">
@@ -108,6 +112,9 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPro
             Public Portfolio
           </Badge>
         </Link>
+
+        {/* Render interactive buttons via Client Component */}
+        <ProfileActions />
       </header>
 
       {/* Main Container */}
