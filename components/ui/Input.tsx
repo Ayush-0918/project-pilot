@@ -44,20 +44,32 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-required={required ? 'true' : undefined}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={error ? errorId : undefined}
-            className={cn(
-              'w-full text-sm rounded-xl px-4 py-3 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
-              leftIcon && 'pl-11',
-              rightElement && 'pr-11',
-              className
-            )}
-            style={{
-              backgroundColor: 'var(--input-bg)',
-              color: 'var(--text-primary)',
-              border: error
-                ? '1px solid rgba(244, 63, 94, 0.5)'
-                : '1px solid var(--input-border)',
-            }}
-            {...props}
+           className={cn(
+  'w-full text-sm rounded-xl px-4 py-3 transition-all duration-200 focus:outline-none focus-visible:ring-2',
+  leftIcon && 'pl-11',
+  rightElement && 'pr-11',
+  className
+)}
+style={{
+  backgroundColor: 'var(--input-bg)',
+  color: 'var(--text-primary)',
+  border: error
+    ? '1px solid rgba(244, 63, 94, 0.5)'
+    : '1px solid var(--input-border)',
+  outline: 'none',
+  ...(props.disabled && {
+    opacity: 0.6,
+    cursor: 'not-allowed',
+  }),
+}}
+onFocus={(e) => {
+  e.currentTarget.style.boxShadow =
+    '0 0 0 2px rgba(var(--color-primary-rgb),0.35)';
+}}
+onBlur={(e) => {
+  e.currentTarget.style.boxShadow = 'none';
+}}
+            
           />
           {rightElement && (
             <div
