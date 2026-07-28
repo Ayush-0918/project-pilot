@@ -45,22 +45,6 @@ model Subscription {
 }
 
 model Project {
-
-  id          String     @id @default(cuid())
-  title       String
-  description String?
-  status      String     @default("Planned")
-  progress    Int        @default(0)
-  tags        String[]
-  roadmap     Json?
-  userId      String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  activities  Activity[]
-  milestones  Milestone[]
-  dueAt       DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
   id            String         @id @default(cuid())
   title         String
   description   String?        @db.Text
@@ -72,10 +56,10 @@ model Project {
   userId        String
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   activities    Activity[]
+  milestones    Milestone[]
   notifications Notification[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-
 }
 
 model Notification {
