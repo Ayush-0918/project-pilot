@@ -11,9 +11,11 @@ export default async function AuthCallbackPage() {
     redirect('/onboarding');
   }
 
+let syncedDbUser = null;
+
   try {
     // Perform database sync using unified helper
-    const syncedDbUser = await syncClerkUser({
+    syncedDbUser = await syncClerkUser({
       id: clerkUser.id,
       firstName: clerkUser.firstName,
       lastName: clerkUser.lastName,
@@ -21,15 +23,23 @@ export default async function AuthCallbackPage() {
       primaryEmailAddressId: clerkUser.primaryEmailAddressId,
       imageUrl: clerkUser.imageUrl
     });
-
-    // Directly restore access to dashboard if they completed onboarding already
-    if (syncedDbUser && syncedDbUser.onboardingCompleted) {
-      redirect('/dashboard');
-    }
   } catch (error) {
     console.error('Error during auth callback synchronization:', error);
   }
 
+  // redirect() throws internally, so these checks must live outside the
+  // try/catch above — otherwise the catch block would swallow the redirect.
+
+  // If this account was soft-deleted, send them to the recovery prompt
+  // instead of straight into the dashboard.
+  if (syncedDbUser && syncedDbUser.deletedAt) {
+    redirect('/restore-account');
+  }
+
+  // Directly restore access to dashboard if they completed onboarding already
+  if (syncedDbUser && syncedDbUser.onboardingCompleted) {
+    redirect('/dashboard');
+  }
+
   // Direct new accounts to the interactive onboarding wizard
-  redirect('/onboarding');
-}
+  redirect('/onboarding');}

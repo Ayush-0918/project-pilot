@@ -324,10 +324,9 @@ export async function getPublicPortfolioData(usernameParam: string) {
       },
     });
 
-    if (!user || !user.portfolioPublic) {
+if (!user || !user.portfolioPublic || user.deletedAt) {
       return null;
     }
-
     const { email, clerkId, ...publicProfile } = user;
     return publicProfile;
   } catch (error) {
@@ -406,9 +405,62 @@ export async function getProfessionalLinks() {
         resumeUrl: true,
       },
     });
-    return user;
+/**
+ * Soft-deletes the current user's account by flagging it with a `deletedAt`
+ * timestamp instead of removing the row. The account (and its data) stays
+ * recoverable for 30 days. See app/api/cron/purge-deleted-accounts/route.ts
+ * for the daily job that permanently erases it after that window.
+ */
+export async function softDeleteAccount() {
+  let userId: string | null = null;
+
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    const session = await auth();
+    userId = session.userId;
+  } else if (process.env.NODE_ENV === "development") {
+    userId = "mock-developer-id";
+  }
+
+  if (!userId) {
+    throw new Error("Unauthenticated user attempt to delete account.");
+  }
+
+  try {
+    return await prisma.user.update({
+      where: { clerkId: userId },
+      data: { deletedAt: new Date() },
+    });
   } catch (error) {
-    console.error("Failed to fetch professional links:", error);
-    return null;
+    console.error("Failed to soft-delete user account:", error);
+    throw error;
+  }
+}
+
+/**
+ * Clears the `deletedAt` flag, restoring a soft-deleted account.
+ * Intended to be called from the recovery prompt shown on login.
+ */
+export async function restoreUserAccount() {
+  let userId: string | null = null;
+
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    const session = await auth();
+    userId = session.userId;
+  } else if (process.env.NODE_ENV === "development") {
+    userId = "mock-developer-id";
+  }
+
+  if (!userId) {
+    throw new Error("Unauthenticated user attempt to restore account.");
+  }
+
+  try {
+    return await prisma.user.update({
+      where: { clerkId: userId },
+      data: { deletedAt: null },
+    });
+  } catch (error) {
+    console.error("Failed to restore user account:", error);
+    throw error;
   }
 }

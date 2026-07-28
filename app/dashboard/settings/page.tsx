@@ -3,11 +3,11 @@
 import { extractSkillsFromResume } from '@/app/actions/extractSkills';
 import {
   getProfessionalLinks,
+  softDeleteAccount,
   updateProfessionalLinks,
   updateProfileAvatar,
   updateUserSkillsInDb
-} from '@/app/actions/user';
-import { Badge } from '@/components/ui/Badge';
+} from '@/app/actions/user';import { Badge } from '@/components/ui/Badge';
 import { Github, Linkedin } from '@/components/ui/BrandIcons';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -42,10 +42,11 @@ import {
   User as UserIcon,
   X,
 } from 'lucide-react';
+import { useClerk } from '@clerk/nextjs';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-
 export default function SettingsPage() {
   const {
     user,
@@ -62,6 +63,8 @@ export default function SettingsPage() {
     accentTheme,
     setAccentTheme,
   } = useAppStore();
+  const router = useRouter();
+  const { signOut } = useClerk();
 
   // Access the global theme state & setTheme so the user can pick directly
   const { theme, setTheme } = useTheme();
@@ -303,12 +306,35 @@ export default function SettingsPage() {
     }
   };
 
-  // Reset Onboarding pathway
+// Reset Onboarding pathway
   const handleResetOnboarding = () => {
     resetOnboarding();
     toast.success("Onboarding reset successfully.");
   };
 
+  // Soft-delete the account: flags it with deletedAt instead of wiping it,
+  // giving the user a 30-day window to recover it by logging back in.
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete your account? You will have 30 days to recover it by logging back in, after which it will be permanently erased.'
+    );
+    if (!confirmed) return;
+
+    setIsDeletingAccount(true);
+    try {
+      await softDeleteAccount();
+      toast.success('Your account has been scheduled for deletion.');
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to delete account. Please try again.');
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
   const [gitUsername, setGitUsername] = useState(githubAnalytics.username || '');
   const [gitLoading, setGitLoading] = useState(false);
 
@@ -1082,15 +1108,16 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Delete Account */}
+{/* Delete Account */}
               <Button
                 variant="outline"
                 className="w-full h-11 border-rose-500/20 hover:bg-rose-500/10 text-rose-400 hover:text-white text-xs font-semibold"
                 leftIcon={<Trash2 className="w-4 h-4 shrink-0" />}
+                onClick={handleDeleteAccount}
+                disabled={isDeletingAccount}
               >
-                Delete Account & Cockpit
+                {isDeletingAccount ? 'Deleting...' : 'Delete Account & Cockpit'}
               </Button>
-
             </CardContent>
           </Card>
 
