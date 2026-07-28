@@ -479,8 +479,7 @@ div:has(> .cl-devMode) {
 }
 
 /* =====================================================
-   ACCENT UTILITIES
-===================================================== */
+   ACCENT UTILITIES*/
 
 .accent-text {
   color: var(--color-primary) !important;
