@@ -30,7 +30,11 @@ import { Progress } from '@/components/ui/Progress';
 import { Button } from '@/components/ui/Button';
 import { ProjectExportMenu } from '@/components/projects/ProjectExportMenu';
 import { ActivityTimeline } from '@/components/projects/ActivityTimeline';
+
+import MilestoneList from '@/components/projects/MilestoneList';
+
 import { ShareToXModal } from '@/components/projects/ShareToXModal';
+
 
 export default function ProjectDetailsPage() {
   const router = useRouter();
@@ -297,6 +301,8 @@ export default function ProjectDetailsPage() {
                 </div>
               </Card>
 
+              <MilestoneList milestones={project.milestones || []} />
+              
               {/* Day-by-Day timeline block tracker */}
               <div className="space-y-6 relative pl-6 before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-[2px] before:bg-white/5">
                 {activeRoadmap?.steps.map((step, idx) => (

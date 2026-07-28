@@ -51,8 +51,13 @@ export async function getUserProjects(take?: number, skip?: number) {
           include: {
             activities: {
               orderBy: { createdAt: 'desc' }
+            },
+            milestones: {
+              orderBy: {
+                dueDate: 'asc'
+              }
             }
-          },
+        },
           orderBy: { updatedAt: 'desc' }
         }
       }
@@ -339,3 +344,42 @@ export async function getProjectActivities(projectId?: string, limit: number = 3
   }
 }
 
+export async function createMilestone(
+  projectId: string,
+  title: string,
+  description?: string,
+  dueDate?: Date
+) {
+  return prisma.milestone.create({
+    data: {
+      title,
+      description,
+      dueDate,
+      projectId,
+    },
+  });
+}
+
+export async function updateMilestoneStatus(
+  milestoneId: string,
+  status: string
+) {
+  return prisma.milestone.update({
+    where: {
+      id: milestoneId,
+    },
+    data: {
+      status,
+    },
+  });
+}
+
+export async function deleteMilestone(
+  milestoneId: string
+) {
+  return prisma.milestone.delete({
+    where: {
+      id: milestoneId,
+    },
+  });
+}

@@ -294,6 +294,667 @@ disconnectGithub: () => void;
   recalculateCareerScore: () => void;
 }
 
+
+export const useAppStore = create<AppStore>((set, get) => ({
+  // Onboarding state
+  onboardingData: {
+    fullName: '',
+    email: '',
+    experienceLevel: 'intermediate',
+    dreamRole: 'AI Engineer',
+    skills: [],
+    resumeFile: null,
+    resumeName: null,
+    githubUrl: '',
+    linkedinUrl: '',
+    availableHoursPerWeek: 15,
+  },
+  onboardingStep: 1,
+  setOnboardingField: (field, value) => set((state) => ({
+    onboardingData: {
+      ...state.onboardingData,
+      [field]: value
+    }
+  })),
+  setOnboardingStep: (step) => set({ onboardingStep: step }),
+  resetOnboarding: () => set({
+    onboardingStep: 1,
+    onboardingData: {
+      fullName: '',
+      email: '',
+      experienceLevel: 'intermediate',
+      dreamRole: 'AI Engineer',
+      skills: [],
+      resumeFile: null,
+      resumeName: null,
+      githubUrl: '',
+      linkedinUrl: '',
+      availableHoursPerWeek: 15,
+    }
+  }),
+
+  // Auth State
+  user: DEFAULT_USER,
+  isAuthenticated: true, // Auto-logged in for rich demo out of the box
+  login: (email, name) => {
+    const newUser = {
+      id: 'user-' + Math.random().toString(36).substr(2, 9),
+      name: name || email?.split('@')[0] || 'User',
+      email: email || '',
+      avatarUrl: '',
+      careerGoal: 'fullstack',
+      githubUrl: '',
+      linkedinUrl: '',
+      resumeUrl: '',
+      skills: []
+    };
+    const adaptive = generateAdaptiveDashboard(newUser);
+    set((state) => ({
+      isAuthenticated: true,
+      user: newUser,
+      careerScore: adaptive.careerScore,
+      projects: adaptive.projects,
+      githubAnalytics: { ...state.githubAnalytics, recruiterInsights: adaptive.insights }
+    }));
+  },
+  signup: (email, name, careerGoal) => {
+    const newUser = {
+      id: 'user-' + Math.random().toString(36).substr(2, 9),
+      name: name || email?.split('@')[0] || 'User',
+      email: email || '',
+      avatarUrl: '',
+      careerGoal: careerGoal || 'fullstack',
+      githubUrl: '',
+      linkedinUrl: '',
+      resumeUrl: '',
+      skills: []
+    };
+    const adaptive = generateAdaptiveDashboard(newUser);
+    set((state) => ({
+      isAuthenticated: true,
+      user: newUser,
+      careerScore: adaptive.careerScore,
+      projects: adaptive.projects,
+      githubAnalytics: { ...state.githubAnalytics, recruiterInsights: adaptive.insights }
+    }));
+  },
+  logout: () => set({ user: null, isAuthenticated: false }),
+  updateProfile: (name, email, careerGoal) => set((state) => {
+    if (!state.user) return {};
+    const updatedUser = { ...state.user, name, email, careerGoal };
+    const adaptive = generateAdaptiveDashboard(updatedUser);
+    return {
+      user: updatedUser,
+      careerScore: adaptive.careerScore,
+      projects: adaptive.projects,
+      githubAnalytics: { ...state.githubAnalytics, recruiterInsights: adaptive.insights }
+    };
+  }),
+  updateAvatar: (avatarUrl) => set((state) => {
+    if (!state.user) return {};
+    const updatedUser = { ...state.user, avatarUrl };
+    const adaptive = generateAdaptiveDashboard(updatedUser);
+    return {
+      user: updatedUser,
+      careerScore: adaptive.careerScore,
+      projects: adaptive.projects,
+      githubAnalytics: { ...state.githubAnalytics, recruiterInsights: adaptive.insights }
+    };
+  }),
+  updateProfessionalLinks: (
+    githubUrl,
+    linkedinUrl,
+    resumeUrl
+) =>
+    set((state) => {
+        if (!state.user) return {};
+
+        return {
+            user: {
+                ...state.user,
+                githubUrl,
+                linkedinUrl,
+                resumeUrl,
+            },
+        };
+    }),
+  updateUserSkills: (skills) => set((state) => {
+    if (!state.user) return {};
+    const updatedUser = { ...state.user, skills };
+    const adaptive = generateAdaptiveDashboard(updatedUser);
+    return {
+      user: updatedUser,
+      careerScore: adaptive.careerScore,
+      projects: adaptive.projects,
+      githubAnalytics: { ...state.githubAnalytics, recruiterInsights: adaptive.insights }
+    };
+  }),
+  syncUserProfile: (dbUser) => {
+    if (!dbUser) return;
+    set((state) => {
+      const updatedUser = {
+        id: dbUser.clerkId || dbUser.id || '',
+        name: dbUser.fullName || dbUser.email?.split('@')[0] || 'Anonymous User',
+        email: dbUser.email || '',
+        avatarUrl: dbUser.imageUrl || '',
+        careerGoal: dbUser.dreamRole || 'fullstack',
+        githubUrl: dbUser.githubUrl || '',
+        linkedinUrl: dbUser.linkedinUrl || '',
+        resumeUrl: dbUser.resumeUrl || '',
+        skills: dbUser.skills || []
+      };
+      const adaptive = generateAdaptiveDashboard(updatedUser);
+      
+      const dbProjects = dbUser.projects || [];
+      const adaptiveProjects = adaptive.projects;
+      
+      const mergedProjects = adaptiveProjects.map(ap => {
+        const dbProj = dbProjects.find((dp: any) => dp.id === ap.id);
+        if (dbProj) {
+          return {
+            ...ap,
+            status: dbProj.status,
+            progress: dbProj.progress,
+            createdAt: dbProj.createdAt,
+            updatedAt: dbProj.updatedAt,
+            milestones: dbProj.milestones || [],
+          };
+        }
+        return ap;
+      });
+
+      const dbActivities: ProjectActivity[] = dbProjects.flatMap((dp: any) =>
+        (dp.activities || []).map((activity: any) => ({
+          id: activity.id,
+          type: activity.type,
+          description: activity.description,
+          projectId: activity.projectId,
+          projectTitle: dp.title,
+          createdAt: new Date(activity.createdAt).toISOString(),
+        }))
+      ).sort((a: ProjectActivity, b: ProjectActivity) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      const updatedRoadmaps = { ...state.roadmaps };
+      dbProjects.forEach((dp: any) => {
+        if (dp.roadmap) {
+          try {
+            const steps = typeof dp.roadmap === 'string' ? JSON.parse(dp.roadmap) : dp.roadmap;
+            updatedRoadmaps[dp.id] = {
+              projectId: dp.id,
+              projectTitle: dp.title,
+              steps: steps
+            };
+          } catch (e) {
+            console.error('Failed to parse database project roadmap:', e);
+          }
+        }
+      });
+
+      return {
+        isAuthenticated: true,
+        user: updatedUser,
+        careerScore: adaptive.careerScore,
+        projects: mergedProjects,
+        roadmaps: updatedRoadmaps,
+        activities: dbActivities,
+        githubAnalytics: { ...state.githubAnalytics, recruiterInsights: adaptive.insights }
+      };
+    });
+  },
+
+  // Projects State
+  projects: MOCK_PROJECTS,
+  selectedProjectId: 'project-1',
+  setProjects: (projects) => set({ projects }),
+  selectProject: (id) => set({ selectedProjectId: id }),
+
+  // Project Activity State
+  activities: [],
+  setActivities: (activities) => set({ activities }),
+
+  // Roadmaps State
+  roadmaps: INITIAL_ROADMAPS,
+  toggleStepCompletion: (projectId, stepId) => set((state) => {
+    const roadmap = state.roadmaps[projectId];
+    if (!roadmap) return {};
+    let isCompleted = false;
+    let stepTitle = '';
+    const updatedSteps = roadmap.steps.map((step) => {
+      if (step.id === stepId) {
+        isCompleted = !step.completed;
+        stepTitle = step.title;
+        return {
+          ...step,
+          completed: isCompleted
+        };
+      }
+      return step;
+    });
+
+    const completedCount = updatedSteps.filter(s => s.completed).length;
+    const progress = Math.round((completedCount / updatedSteps.length) * 100);
+
+    // Sync changes to the database
+    toggleProjectMilestoneInDb(projectId, stepId, updatedSteps, progress);
+    const projectTitle = state.projects.find((project) => project.id === projectId)?.title;
+    const newActivity: ProjectActivity | null = isCompleted ? {
+      id: `local-${Date.now()}-${stepId}`,
+      type: 'milestone',
+      description: `Completed milestone: ${stepTitle}`,
+      projectId,
+      projectTitle,
+      createdAt: new Date().toISOString(),
+    } : null;
+
+    if (isCompleted) {
+      createActivityInDb(projectId, `Completed milestone: ${stepTitle}`, 'milestone');
+    }
+
+    return {
+      roadmaps: {
+        ...state.roadmaps,
+        [projectId]: {
+          ...roadmap,
+          steps: updatedSteps
+        }
+      },
+      activities: newActivity ? [newActivity, ...state.activities] : state.activities,
+      projects: state.projects.map(p => {
+        if (p.id === projectId) {
+          return {
+            ...p,
+            progress,
+            status: progress === 100 ? 'Completed' : 'In Progress'
+          };
+        }
+        return p;
+      })
+    };
+  }),
+  toggleTaskCompletion: (projectId, stepId, taskIndex) => set((state) => {
+    const roadmap = state.roadmaps[projectId];
+    if (!roadmap) return {};
+
+    const updatedSteps = roadmap.steps.map((step) => {
+      if (step.id === stepId) {
+        // Toggling step completion directly for clean UX
+      }
+      return step;
+    });
+
+    return {};
+  }),
+  initializeRoadmap: (projectId, title) => set((state) => {
+    if (state.roadmaps[projectId]) return {}; // Already exists
+
+    const newSteps = [
+      {
+        id: 'step-1',
+        title: 'Project Inception & Architecture Planning',
+        duration: 'Days 1-2',
+        description: 'Establish repository structure, select frameworks, draft API endpoints, and define exact schemas.',
+        tasks: ['Initialize clean Git repository', 'Create basic workspace outline', 'Write design doc outlining core endpoints'],
+        completed: false,
+        type: 'fundamentals' as const
+      },
+      {
+        id: 'step-2',
+        title: 'UI Design & Frontend Shell Implementation',
+        duration: 'Days 3-6',
+        description: 'Build core application pages, setup styling tokens, configure responsive grids, and design key page cards.',
+        tasks: ['Build global responsive navbar', 'Draft layout shells with skeleton loaders', 'Integrate Tailwind variables for themes'],
+        completed: false,
+        type: 'frontend' as const
+      },
+      {
+        id: 'step-3',
+        title: 'Core Backend Logics & DB Integration',
+        duration: 'Days 7-12',
+        description: 'Establish database connections, build backend api pipelines, run queries, and setup schemas.',
+        tasks: ['Create basic backend models', 'Verify database connections', 'Test controllers with robust error handlers'],
+        completed: false,
+        type: 'backend' as const
+      },
+      {
+        id: 'step-4',
+        title: 'API Integrations & Custom Features',
+        duration: 'Days 13-16',
+        description: 'Integrate external AI model endpoints, webhook handlers, and other special feature engines.',
+        tasks: ['Integrate OpenAI/anthropic API calls', 'Build webhook routes for payments or git hooks', 'Connect storage servers (S3/Cloudinary)'],
+        completed: false,
+        type: 'integration' as const
+      },
+      {
+        id: 'step-5',
+        title: 'Deployments & Recruiter Handshakes',
+        duration: 'Days 17-20',
+        description: 'Launch application to production, set SSL configs, run unit tests, and prepare markdown portfolios.',
+        tasks: ['Deploy to Vercel/Railway', 'Run lighthouse tests and optimize assets', 'Create detailed README.md for recruiter eyes'],
+        completed: false,
+        type: 'deployment' as const
+      }
+    ];
+
+    const projectData = state.projects.find(p => p.id === projectId);
+    if (projectData) {
+      saveProjectToDb({
+        id: projectId,
+        title: projectData.title,
+        description: projectData.description || undefined,
+        status: 'Planned',
+        progress: 0,
+        tags: projectData.technologies,
+        roadmap: newSteps
+      });
+      createActivityInDb(projectId, `Initialized Blueprint: ${title}`, 'project_start');
+    }
+
+    const newActivity: ProjectActivity = {
+      id: `local-${Date.now()}-${projectId}`,
+      type: 'project_start',
+      description: `Initialized Blueprint: ${title}`,
+      projectId,
+      projectTitle: title,
+      createdAt: new Date().toISOString(),
+    };
+
+    return {
+      activities: [newActivity, ...state.activities],
+      roadmaps: {
+        ...state.roadmaps,
+        [projectId]: {
+          projectId,
+          projectTitle: title,
+          steps: newSteps
+        }
+      }
+    };
+  }),
+
+  // Chat State
+  conversations: INITIAL_CONVERSATIONS,
+  activeConversationId: 'conv-1',
+  sendMessage: (content, codeSnippet, attachments) => set((state) => {
+    const activeId = state.activeConversationId;
+    if (!activeId) return {};
+
+    const newMessage: ChatMessage = {
+      id: 'msg-usr-' + Math.random().toString(36).substr(2, 9),
+      role: 'user',
+      content,
+      timestamp: new Date(),
+      codeSnippet,
+      attachments
+    };
+
+    // Update active conversation
+    const updatedConversations = state.conversations.map((conv) => {
+      if (conv.id === activeId) {
+        return {
+          ...conv,
+          messages: [...conv.messages, newMessage],
+          lastUpdated: new Date()
+        };
+      }
+      return conv;
+    });
+
+    // Prepare an empty AI message to stream into
+    const aiMessageId = 'msg-ai-' + Math.random().toString(36).substr(2, 9);
+    const initialAiMessage: ChatMessage = {
+      id: aiMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date()
+    };
+
+    const updatedConversationsWithAi = updatedConversations.map((conv) => {
+      if (conv.id === activeId) {
+        return {
+          ...conv,
+          messages: [...conv.messages, initialAiMessage]
+        };
+      }
+      return conv;
+    });
+
+    // Start streaming async
+    (async () => {
+      try {
+        const activeConv = get().conversations.find((c) => c.id === activeId);
+        if (!activeConv) return;
+        
+        const apiMessages = [...activeConv.messages, newMessage].map(m => ({ role: m.role, content: m.content }));
+        
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: apiMessages,
+            userContext: get().user || DEFAULT_USER
+          })
+        });
+
+        if (!response.ok || !response.body) throw new Error('Failed to fetch AI response');
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let aiContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          aiContent += chunk;
+          
+          set((s) => ({
+            conversations: s.conversations.map((c) => {
+              if (c.id === activeId) {
+                return {
+                  ...c,
+                  messages: c.messages.map(m => m.id === aiMessageId ? { ...m, content: aiContent } : m),
+                  lastUpdated: new Date()
+                };
+              }
+              return c;
+            })
+          }));
+        }
+      } catch (error) {
+        console.error('AI Streaming Error:', error);
+        set((s) => ({
+          conversations: s.conversations.map((c) => {
+            if (c.id === activeId) {
+              return {
+                ...c,
+                messages: c.messages.map(m => m.id === aiMessageId ? { ...m, content: 'Sorry, I encountered an error. Please check your API key and try again.' } : m)
+              };
+            }
+            return c;
+          })
+        }));
+      }
+    })();
+
+    return {
+      conversations: updatedConversationsWithAi
+    };
+  }),
+  createNewConversation: (title) => {
+    const newId = 'conv-' + Math.random().toString(36).substr(2, 9);
+    const newConv: ChatConversation = {
+      id: newId,
+      title: title || 'New Mentor Guidance Session',
+      messages: [
+        {
+          id: 'msg-init-' + Math.random().toString(36).substr(2, 9),
+          role: 'assistant',
+          content: 'Hello! I am your AI Career Mentor. Ask me anything about your recommended projects, how to fill skill gaps, structuring your github portfolio, or preparing for interviews with recruiters!',
+          timestamp: new Date()
+        }
+      ],
+      lastUpdated: new Date()
+    };
+
+    set((state) => ({
+      conversations: [newConv, ...state.conversations],
+      activeConversationId: newId
+    }));
+
+    return newId;
+  },
+  selectConversation: (id) => set({ activeConversationId: id }),
+  deleteConversation: (id) => set((state) => {
+    const updated = state.conversations.filter((c) => c.id !== id);
+    const active = state.activeConversationId === id 
+      ? (updated.length > 0 ? updated[0].id : null)
+      : state.activeConversationId;
+    return {
+      conversations: updated,
+      activeConversationId: active
+    };
+  }),
+
+  // GitHub Analytics State
+  githubAnalytics: MOCK_GITHUB,
+  connectGithub: async (username) => {
+    try {
+      const res = await fetch(`https://api.github.com/users/${username}/repos?per_page=30&sort=updated`);
+      if (!res.ok) throw new Error('Failed to fetch repositories');
+      const repos = await res.json();
+      
+      if (!Array.isArray(repos)) throw new Error('Invalid response from GitHub API');
+      
+      const langCounts: Record<string, number> = {};
+      repos.forEach(r => {
+        if (r.language) {
+          langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+        }
+      });
+      
+      const colors: Record<string, string> = {
+        TypeScript: '#3178c6',
+        JavaScript: '#f1e05a',
+        HTML: '#e34c26',
+        CSS: '#563d7c',
+        Python: '#3572A5',
+        Java: '#b07219',
+        Go: '#00ADD8',
+        Rust: '#dea584',
+        C: '#555555',
+        'C++': '#f34b7d',
+        Ruby: '#701516',
+        PHP: '#4F5D95',
+        Shell: '#89e051'
+      };
+      
+      const totalLangs = Object.values(langCounts).reduce((a, b) => a + b, 0) || 1;
+      const languages = Object.entries(langCounts).map(([name, count]) => ({
+        name,
+        value: Math.round((count / totalLangs) * 100),
+        color: colors[name] || '#8b5cf6'
+      })).sort((a, b) => b.value - a.value);
+      
+      const totalStars = repos.reduce((acc, r) => acc + (r.stargazers_count || 0), 0);
+      const totalForks = repos.reduce((acc, r) => acc + (r.forks_count || 0), 0);
+      
+      const portfolioStrengthScore = Math.min(98, 50 + repos.length * 2 + totalStars * 3);
+      const consistencyScore = Math.min(95, 60 + (repos.length % 5) * 8);
+      const aiEngineerReadiness = Math.min(95, 40 + (langCounts['Python'] || 0) * 12 + (langCounts['TypeScript'] || 0) * 6);
+      
+      const skillDetection = [
+        ...new Set([
+          ...Object.keys(langCounts).map(l => `${l} Development`),
+          'UI Architecture',
+          'API Infrastructure',
+          'Modern Git Workflows'
+        ])
+      ].slice(0, 6);
+      
+      const recruiterInsights = [
+        `Demonstrates strong capabilities in ${Object.keys(langCounts).slice(0, 3).join(', ') || 'coding'} through public repositories.`,
+        `Active GitHub profile @${username} with ${repos.length} public repositories and ${totalStars} stars recorded.`,
+        `Primary stack focus lies in ${languages[0]?.name || 'Fullstack'} systems with secondary exposure in ${languages[1]?.name || 'web'} development.`
+      ];
+      
+      const growthRecommendations = [
+        `Increase unit test coverage in your primary ${languages[0]?.name || 'TypeScript'} repositories.`,
+        `Configure GitHub Actions CI pipeline for automated testing on active pushes.`,
+        `Improve README.md documentation for ${repos[0]?.name || 'your projects'} to showcase system design patterns.`
+      ];
+      
+      const repositoryIntelligence = repos.map((r: any) => ({
+        name: r.name,
+        description: r.description || 'Public GitHub repository.',
+        analysis: [
+          r.description ? 'Descriptive repository metadata' : 'Clean code container',
+          `Main language detected as ${r.language || 'Plain text'}`,
+          r.fork ? 'Forked open-source repository' : 'Original pilot blueprint development',
+          `Last active update: ${new Date(r.updated_at).toLocaleDateString()}`
+        ],
+        detectedSkills: [r.language || 'General Stack', 'Code Architecture', r.fork ? 'Collaboration' : 'Independent Project'],
+        growthRecommendation: [
+          `Add more tests to verify ${r.language || 'codebase'} coverage`,
+          'Document configuration setups in README.md'
+        ],
+        stars: r.stargazers_count || 0,
+        forks: r.forks_count || 0,
+        lang: r.language || 'Unknown'
+      }));
+      
+      set((state) => ({
+        githubAnalytics: {
+          username,
+          avatarUrl: repos[0]?.owner?.avatar_url || state.githubAnalytics.avatarUrl,
+          totalRepos: repos.length,
+          totalCommits: repos.length * 15 + totalStars * 2, // simulated commits count
+          consistencyScore,
+          portfolioStrengthScore,
+          aiEngineerReadiness,
+          connected: true,
+          languages,
+          recentCommits: state.githubAnalytics.recentCommits,
+          skillDetection,
+          growthRecommendations,
+          recruiterInsights,
+          repositoryIntelligence
+        }
+      }));
+    } catch (e) {
+      console.error('GitHub API failed, falling back to mock metrics:', e);
+      set((state) => ({
+        githubAnalytics: {
+          ...state.githubAnalytics,
+          username,
+          connected: true
+        }
+      }));
+    }
+  },
+  disconnectGithub: () => set((state) => ({
+    githubAnalytics: {
+      ...state.githubAnalytics,
+      username: '',
+      connected: false
+    }
+  })),
+
+  // Career Score State
+  careerScore: MOCK_CAREER,
+  recalculateCareerScore: () => set((state) => {
+    // Simply increment score on action or keep constant for representation
+    const newScore = Math.min(100, state.careerScore.overallScore + 2);
+    return {
+      careerScore: {
+        ...state.careerScore,
+        overallScore: newScore
+      }
+    };
+  })
+
 export const useAppStore = create<AppStore>()((set, get, api) => ({
   ...createOnboardingSlice(set, get, api),
   ...createAuthSlice(set, get, api),
@@ -307,5 +968,9 @@ export const useAppStore = create<AppStore>()((set, get, api) => ({
 )(set, get, api),
   ...createGithubSlice(MOCK_GITHUB)(set, get, api),
   ...createCareerSlice(MOCK_CAREER)(set, get, api),
+
+
+
   ...createThemeSlice(set, get, api),
+
 }));
