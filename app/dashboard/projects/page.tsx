@@ -5,6 +5,7 @@ import {
   type ProjectStatusFilter,
   type ProjectView
 } from '@/components/projects/ProjectControls';
+import RecommendedProjectsSkeleton from '@/components/skeletons/RecommendedProjectsSkeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardFooter } from '@/components/ui/Card';
@@ -134,7 +135,19 @@ export default function RecommendedProjectsPage() {
       if (currentTarget) observer.unobserve(currentTarget);
     };
   }, [handleLoadMore, hasMore, isLoadingMore]);
+    const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <RecommendedProjectsSkeleton />;
+  }
   return (
     <div className="space-y-8 pb-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

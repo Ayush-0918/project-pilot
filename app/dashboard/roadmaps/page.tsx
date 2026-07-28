@@ -1,42 +1,38 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import RoadmapsSkeleton from "@/components/skeletons/RoadmapSkeleton";
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Progress } from '@/components/ui/Progress';
+import { useAppStore } from '@/store/useAppStore';
+import type { RoadmapStep } from '@/types';
 import {
-  Map,
-  CheckCircle,
-  Clock,
-  Cpu,
-  Sparkles,
-  ChevronRight,
-  Terminal as TermIcon,
-  GripVertical,
-} from 'lucide-react';
-import {
-  DndContext,
   closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
+  DndContext,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import {
   SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
   useSortable,
+  verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useAppStore } from '@/store/useAppStore';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Progress } from '@/components/ui/Progress';
-import type { RoadmapStep } from '@/types';
+import {
+  CheckCircle,
+  Clock,
+  GripVertical,
+  Map,
+  Sparkles
+} from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 function SortableStepCard({
   step,
@@ -157,7 +153,11 @@ function SortableStepCard({
 export default function VisualRoadmapsPage() {
   const { projects, selectedProjectId, roadmaps, toggleStepCompletion, reorderSteps } = useAppStore();
   const [activeId, setActiveId] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
+  React.useEffect(() => {
+    setIsLoading(false);
+  }, []);
   const activeProject = projects.find(p => p.id === selectedProjectId);
   const activeRoadmap = activeProject ? roadmaps[activeProject.id] : null;
 
@@ -168,6 +168,9 @@ export default function VisualRoadmapsPage() {
       },
     })
   );
+  if (isLoading) {
+  return <RoadmapsSkeleton />;
+}
 
   if (!activeProject || !activeRoadmap) {
     return (

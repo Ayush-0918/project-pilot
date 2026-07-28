@@ -1,5 +1,6 @@
 'use client';
 import { PieChartSkeleton } from '@/components/charts/ChartSkeleton';
+import GitHubSkeleton from "@/components/skeletons/GitHubSkeleton";
 import { Badge } from '@/components/ui/Badge';
 import { Github } from '@/components/ui/BrandIcons';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -36,7 +37,9 @@ export default function GitHubAnalyticsPage() {
     setMounted(true);
   }, []);
 
-
+if (!mounted) {
+  return <GitHubSkeleton />;
+}
 
   return (
     <div className="space-y-8 pb-12">
