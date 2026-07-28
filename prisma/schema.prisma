@@ -45,6 +45,22 @@ model Subscription {
 }
 
 model Project {
+
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  status      String     @default("Planned")
+  progress    Int        @default(0)
+  tags        String[]
+  roadmap     Json?
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities  Activity[]
+  milestones  Milestone[]
+  dueAt       DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
   id            String         @id @default(cuid())
   title         String
   description   String?        @db.Text
@@ -59,6 +75,7 @@ model Project {
   notifications Notification[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+
 }
 
 model Notification {
@@ -91,6 +108,21 @@ model Activity {
   createdAt   DateTime @default(now())
 }
 
+
+model Milestone {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String   @default("UPCOMING") // UPCOMING, ONGOING, COMPLETED
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+
 model AiMessage {
   id        String   @id @default(cuid())
   userId    String   
@@ -101,3 +133,4 @@ model AiMessage {
 
   @@index([userId, createdAt])
 }
+
