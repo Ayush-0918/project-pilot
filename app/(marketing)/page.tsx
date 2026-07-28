@@ -142,11 +142,11 @@ export default function MarketingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      
       {/* 
-     
-     * Root wrapper — uses CSS custom property vars so the entire page flips
-     * correctly in both dark and light themes. No hardcoded hex colours.
-     */}
+       * Root wrapper — uses CSS custom property vars so the entire page flips
+       * correctly in both dark and light themes. No hardcoded hex colours.
+       */}
       <div
         className="flex flex-col min-h-screen relative overflow-hidden"
         style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
@@ -202,7 +202,7 @@ export default function MarketingPage() {
                 </span>
               </motion.div>
 
-              {/* Headline — inherits body colour which flips via var(--foreground) */}
+              {/* Headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -257,13 +257,7 @@ export default function MarketingPage() {
                 <div
                   className="absolute -inset-0.5 rounded-3xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"
                   style={{
-                    background: `linear-gradient(
-90deg,
-rgba(var(--color-primary-rgb),0.15),
-var(--color-primary),
-rgba(var(--color-primary-rgb),0.15)
-)`,
-
+                    background: `linear-gradient(90deg, rgba(var(--color-primary-rgb),0.15), var(--color-primary), rgba(var(--color-primary-rgb),0.15))`,
                   }}
                 />
 
@@ -532,7 +526,6 @@ rgba(var(--color-primary-rgb),0.15)
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-
                 {/* Free Plan */}
                 <Card
                   hoverEffect={true}
@@ -674,158 +667,11 @@ rgba(var(--color-primary-rgb),0.15)
                     </Button>
                   </CardFooter>
                 </Card>
-
-              </div>
-            </div>
-          </section>
-
-          {/* ── FAQ ───────────────────────────────────────────────────── */}
-          <section
-            id="faq"
-            className="py-24 border-t relative"
-            style={{ borderColor: 'var(--border-subtle)' }}
-          >
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-16">
-                <Badge variant="primary" className="mb-4">Support</Badge>
-                <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--text-primary)' }}>
-                  Frequently Asked Questions
-                </h2>
-                <p className="text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>
-                  Find answers to common questions about ProjectPilot AI.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {faqs.map((faq, idx) => {
-                  const isOpen = activeFaq === idx;
-                  return (
-                    <div
-                      key={idx}
-                      className="glass-panel rounded-2xl overflow-hidden transition-all duration-300"
-                      style={{ borderColor: 'var(--border-subtle)' }}
-                    >
-                      <button
-                        onClick={() => setActiveFaq(isOpen ? null : idx)}
-                        className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold transition-colors cursor-pointer"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        <span className="text-sm sm:text-base">{faq.q}</span>
-                        <ChevronDown
-                          className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                          style={{
-                            color: isOpen
-                              ? "var(--color-primary)"
-                              : "var(--text-muted)"
-                          }}
-                        />
-                      </button>
-
-                      {isOpen && (
-                        <div
-                          className="px-6 pb-6 text-xs sm:text-sm leading-relaxed pt-4"
-                          style={{
-                            color: 'var(--text-secondary)',
-                            borderTop: '1px solid var(--border-subtle)',
-                            backgroundColor: 'var(--hover-bg)',
-                          }}
-                        >
-                          {faq.a}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </section>
 
         </main>
-
-        {/* ── FOOTER ────────────────────────────────────────────────── */}
-        <footer
-          className="border-t relative z-10 py-12"
-          style={{
-            borderColor: 'var(--border-subtle)',
-            backgroundColor: 'var(--surface-primary)',
-          }}
-        >
-          <div
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between text-xs sm:text-sm"
-            style={{ color: 'var(--text-muted)' }}
-          >
-            {/* Brand */}
-            <div className="flex items-center space-x-3 mb-6 md:mb-0">
-              <div
-                className="p-1.5 rounded-lg border"
-                style={{
-                  color: "var(--color-primary)",
-                  backgroundColor: "rgba(var(--color-primary-rgb),0.10)",
-                  borderColor: "rgba(var(--color-primary-rgb),0.25)"
-                }}
-              >
-                <Compass className="w-5 h-5" />
-              </div>
-              <span className="font-bold" style={{ color: 'var(--text-primary)' }}>ProjectPilot AI</span>
-            </div>
-
-            {/* Nav links */}
-            <div className="flex flex-wrap items-center justify-center gap-6 mb-6 md:mb-0">
-              <a href="#features" className="transition-colors"
-                style={{
-                  color: "var(--text-secondary)"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--color-primary)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)"
-                }}>Features</a>
-              <a
-                href="#workflow"
-                className="transition-colors"
-                style={{
-                  color: "var(--text-secondary)"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--color-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                }}
-              >
-                How it works
-              </a>
-              <a
-                href="#pricing"
-                className="transition-colors"
-                style={{
-                  color: "var(--text-secondary)"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--color-primary)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)"
-                }}>Pricing</a>
-              <a href="/login" className="transition-colors"
-                style={{
-                  color: "var(--text-secondary)"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--color-primary)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)"
-                }}>Dashboard Portal</a>
-            </div>
-
-            {/* Copyright */}
-            <div className="text-center md:text-right font-mono">
-              &copy; {new Date().getFullYear()} ProjectPilot AI. All rights reserved.
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );

@@ -27,6 +27,11 @@ export function ActivityFeed() {
       const res = await fetch(url);
       const data = await res.json();
 
+      if (!res.ok || !data.activities) {
+        setHasMore(false);
+        return;
+      }
+
       setActivities((prev) => 
         currentCursor ? [...prev, ...data.activities] : data.activities
       );

@@ -276,23 +276,8 @@ export interface AppStore
     GithubSlice,
     CareerSlice,
     ThemeSlice {
-  // Onboarding State
-  onboardingData: OnboardingData;
-  onboardingStep: number;
-  setOnboardingField: <K extends keyof OnboardingData>(field: K, value: OnboardingData[K]) => void;
-  setOnboardingStep: (step: number) => void;
-  resetOnboarding: () => void;
-
-  // GitHub Analytics State
-githubAnalytics: GitHubAnalytics;
-connectGithub: (username: string) => Promise<void>;
-disconnectGithub: () => void;
-
-
-  // Career Score State
-  careerScore: CareerScore;
-  recalculateCareerScore: () => void;
 }
+
 
 export const useAppStore = create<AppStore>()((set, get, api) => ({
   ...createOnboardingSlice(set, get, api),
@@ -307,5 +292,9 @@ export const useAppStore = create<AppStore>()((set, get, api) => ({
 )(set, get, api),
   ...createGithubSlice(MOCK_GITHUB)(set, get, api),
   ...createCareerSlice(MOCK_CAREER)(set, get, api),
+
+
+
   ...createThemeSlice(set, get, api),
+
 }));
