@@ -142,10 +142,10 @@ export default function MarketingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-    /*
+    {/*
      * Root wrapper — uses CSS custom property vars so the entire page flips
      * correctly in both dark and light themes. No hardcoded hex colours.
-     */
+     */}
     <div
       className="flex flex-col min-h-screen relative overflow-hidden"
       style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
@@ -656,7 +656,9 @@ borderColor:"rgba(var(--color-primary-rgb),0.35)"
                   </ul>
                 </CardContent>
                 <CardFooter className="pt-2">
-                  <button
+                  <Button
+                    variant="premium"
+                    className="w-full"
                     onClick={async () => {
                       try {
                         const res = await fetch('/api/stripe/checkout', { method: 'POST' });
@@ -666,10 +668,9 @@ borderColor:"rgba(var(--color-primary-rgb),0.35)"
                         window.location.href = '/onboarding';
                       }
                     }}
-                    className="w-full"
                   >
-                    <Button variant="premium" className="w-full">Get Premium Access</Button>
-                  </button>
+                    Get Premium Access
+                  </Button>
                 </CardFooter>
               </Card>
 
