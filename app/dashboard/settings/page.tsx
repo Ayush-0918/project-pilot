@@ -7,9 +7,6 @@ import {
   updateProfessionalLinks,
   updateProfileAvatar,
   updateUserSkillsInDb
-
-} from '@/app/actions/user';import { Badge } from '@/components/ui/Badge';
-
 } from '@/app/actions/user';
 import SettingsSkeleton from '@/components/skeletons/SettingsSkeleton';
 import { Badge } from '@/components/ui/Badge';

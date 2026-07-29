@@ -405,6 +405,13 @@ export async function getProfessionalLinks() {
         resumeUrl: true,
       },
     });
+    return user;
+  } catch (error) {
+    console.error("Failed to fetch professional links:", error);
+    return null;
+  }
+}
+
 /**
  * Soft-deletes the current user's account by flagging it with a `deletedAt`
  * timestamp instead of removing the row. The account (and its data) stays

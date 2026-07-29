@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';import { useRouter, useParams } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { 
@@ -23,7 +24,8 @@ import {
   Activity
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import confetti from 'canvas-confetti';import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
+import confetti from 'canvas-confetti';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Progress } from '@/components/ui/Progress';
 import { Button } from '@/components/ui/Button';
@@ -44,7 +46,7 @@ export default function ProjectDetailsPage() {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Timeline' | 'Activity' | 'Sandbox' | 'Keywords'>('Overview');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 const [copiedKeywordIdx, setCopiedKeywordIdx] = useState<number | null>(null);
-const previousStatusRef = useRef<string | null>(null);  
+const previousStatusRef = useRef<string | null | undefined>(null);  
   // Find project based on slug params or active Zustand ID
   const projectId = params.id as string;
   const project = projects.find(p => p.id === projectId);
