@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { 
@@ -24,7 +23,7 @@ import {
   Activity
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
+import confetti from 'canvas-confetti';import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Progress } from '@/components/ui/Progress';
 import { Button } from '@/components/ui/Button';
@@ -44,8 +43,8 @@ export default function ProjectDetailsPage() {
   // Local states
   const [activeTab, setActiveTab] = useState<'Overview' | 'Timeline' | 'Activity' | 'Sandbox' | 'Keywords'>('Overview');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [copiedKeywordIdx, setCopiedKeywordIdx] = useState<number | null>(null);
-  
+const [copiedKeywordIdx, setCopiedKeywordIdx] = useState<number | null>(null);
+const previousStatusRef = useRef<string | null>(null);  
   // Find project based on slug params or active Zustand ID
   const projectId = params.id as string;
   const project = projects.find(p => p.id === projectId);
@@ -54,10 +53,29 @@ export default function ProjectDetailsPage() {
   const activeRoadmap = project ? roadmaps[project.id] : undefined;
 
   // Set this project as active on mount just in case
-  useEffect(() => {
+useEffect(() => {
     if (project) selectProject(project.id);
   }, [project, selectProject]);
 
+  // Fire confetti only the moment a project's status flips to "Completed".
+  // previousStatusRef starts as null, so on a page refresh for a project
+  // that's already "Completed" this will NOT fire — it only fires on a
+  // live transition during the current session.
+  useEffect(() => {
+    if (!project) return;
+
+    const previousStatus = previousStatusRef.current;
+
+    if (previousStatus && previousStatus !== 'Completed' && project.status === 'Completed') {
+      confetti({
+        particleCount: 150,
+        spread: 90,
+        origin: { y: 0.6 },
+      });
+    }
+
+    previousStatusRef.current = project.status;
+  }, [project?.status]);
   if (!project) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center text-center">
