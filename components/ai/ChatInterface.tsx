@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/Button';
-import { Send, Sparkles, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Send, Sparkles, AlertTriangle, RefreshCw, Brain } from 'lucide-react';
 
 export default function ChatInterface() {
   const chatData = useChat() as any;
@@ -70,6 +70,19 @@ export default function ChatInterface() {
             <div className="prose prose-invert max-w-none text-xs leading-relaxed">
               <ReactMarkdown>{m.content}</ReactMarkdown>
             </div>
+            {m.role !== 'user' && (
+              <div className="pt-2 flex justify-start border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => sendMessage({ content: "Rewrite your previous response in extremely simple terms, using analogies suitable for a 15-year-old beginner.", role: 'user' } as any)}
+                  className="flex items-center gap-1.5 text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors font-medium cursor-pointer"
+                  title="Explain Like I'm 15"
+                >
+                  <Brain className="w-3.5 h-3.5" />
+                  <span>Explain Like I'm 15</span>
+                </button>
+              </div>
+            )}
           </div>
         ))}
 

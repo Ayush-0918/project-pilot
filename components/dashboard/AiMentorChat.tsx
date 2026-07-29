@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Loader2, Trash2, Send, Bot, User } from 'lucide-react';
+import { Loader2, Trash2, Send, Bot, User, Brain } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -48,12 +48,10 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isSending]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isSending) return;
+  const sendMessageText = async (text: string) => {
+    if (!text.trim() || isSending) return;
 
-    const userMsg = input.trim();
-    setInput('');
+    const userMsg = text.trim();
     const updatedMessages = [...messages, { role: 'user' as const, content: userMsg }];
     setMessages(updatedMessages);
     setIsSending(true);
@@ -92,6 +90,14 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isSending) return;
+    const currentInput = input;
+    setInput('');
+    await sendMessageText(currentInput);
   };
 
   // 2. Clear Chat History handler
@@ -232,7 +238,7 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
                 className={`rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed ${
                   m.role === 'user'
                     ? 'rounded-tr-none'
-                    : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
+                    : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none flex flex-col gap-2'
                 }`}
                 style={
   m.role === "user"
@@ -243,7 +249,20 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
     : undefined
 }
               >
-                {m.content}
+                <div>{m.content}</div>
+                {m.role !== 'user' && (
+                  <div className="pt-2 flex justify-start border-t border-white/5 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => sendMessageText("Rewrite your previous response in extremely simple terms, using analogies suitable for a 15-year-old beginner.")}
+                      className="flex items-center gap-1.5 text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors font-semibold cursor-pointer"
+                      title="Explain Like I'm 15"
+                    >
+                      <Brain className="w-3.5 h-3.5" />
+                      <span>Explain Like I'm 15</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))
