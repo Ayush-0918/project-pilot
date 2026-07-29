@@ -479,8 +479,7 @@ div:has(> .cl-devMode) {
 }
 
 /* =====================================================
-   ACCENT UTILITIES
-===================================================== */
+   ACCENT UTILITIES*/
 
 .accent-text {
   color: var(--color-primary) !important;
@@ -514,4 +513,38 @@ div:has(> .cl-devMode) {
 
 .accent-border-hover:hover {
   border-color: var(--color-primary) !important;
+}
+
+/* Print-specific Optimizations for Public Portfolios */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+  header, .no-print, button {
+    display: none !important;
+  }
+  body, .min-h-screen {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+  }
+  section {
+    break-inside: avoid;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    color: #1e293b !important;
+    margin-bottom: 1rem;
+    padding: 1rem !important;
+  }
+  h1, h2, h3, p, span {
+    color: #0f172a !important;
+  }
+  .text-slate-300, .text-slate-400, .text-slate-500 {
+    color: #475569 !important;
+  }
+  .bg-white\/5, .bg-indigo-950\/40 {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+  }
 }

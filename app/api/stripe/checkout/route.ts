@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { stripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic'; // Prevent static generation/prerendering of this API route
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();

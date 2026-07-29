@@ -7,7 +7,13 @@ import {
   updateProfessionalLinks,
   updateProfileAvatar,
   updateUserSkillsInDb
+
 } from '@/app/actions/user';import { Badge } from '@/components/ui/Badge';
+
+} from '@/app/actions/user';
+import SettingsSkeleton from '@/components/skeletons/SettingsSkeleton';
+import { Badge } from '@/components/ui/Badge';
+
 import { Github, Linkedin } from '@/components/ui/BrandIcons';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -15,11 +21,11 @@ import { Input } from '@/components/ui/Input';
 import Tooltip from '@/components/ui/Tooltip';
 import type { Theme } from '@/lib/ThemeProvider';
 import { useTheme } from '@/lib/ThemeProvider';
-import { useAppStore } from '@/store/useAppStore';
 import {
   ACCENT_THEMES,
   AccentTheme,
 } from '@/store/slices/themeSlice';
+import { useAppStore } from '@/store/useAppStore';
 import {
   AlertCircle,
   Camera,
@@ -80,22 +86,27 @@ export default function SettingsPage() {
   const [linksLoading, setLinksLoading] = useState(false);
   const [linksSuccess, setLinksSuccess] = useState(false);
   const [linksError, setLinksError] = useState('');
-
+  const [pageLoading, setPageLoading] = useState(true);
+  
   useEffect(() => {
-    async function loadLinks() {
-      try {
-        const data = await getProfessionalLinks();
-        if (!data) return;
+  async function loadLinks() {
+    try {
+      const data = await getProfessionalLinks();
 
+      if (data) {
         setGithubUrl(data.githubUrl || "");
         setLinkedinUrl(data.linkedinUrl || "");
         setResumeUrl(data.resumeUrl || "");
-      } catch (err) {
-        console.error(err);
       }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPageLoading(false);
     }
-    loadLinks();
-  }, []);
+  }
+
+  loadLinks();
+}, []);
 
   // Portfolio Visibility States
   const [isPortfolioPublic, setIsPortfolioPublic] = useState(user?.portfolioPublic ?? false);
@@ -430,7 +441,11 @@ export default function SettingsPage() {
       description: 'Crisp white surface — great for bright environments.',
       icon: <Sun className="w-5 h-5 text-amber-500" />,
     },
+
   ];
+  if (pageLoading) {
+  return <SettingsSkeleton />;
+}
 
   return (
     <div className="space-y-8 pb-12">

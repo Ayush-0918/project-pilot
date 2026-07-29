@@ -1,6 +1,6 @@
 "use client";
-
 import { RadarChartSkeleton } from "@/components/charts/ChartSkeleton";
+import CareerSkeleton from "@/components/skeletons/CarrerSkeleton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import {
@@ -41,7 +41,9 @@ export default function CareerScorePage() {
   React.useEffect(() => {
     setMounted(true);
   }, []);
-
+  if (!mounted) {
+  return <CareerSkeleton />;
+}
   // Radar chart formatting
   const radarData = [
     { subject: "Frontend", A: careerScore.frontendReadiness, fullMark: 100 },

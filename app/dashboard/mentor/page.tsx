@@ -1,36 +1,33 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageSquareCode, 
-  Send, 
-  Sparkles, 
-  Terminal, 
-  Trash2, 
-  Plus, 
-  Paperclip, 
-  CornerDownLeft,
-  Copy,
-  CheckCircle,
-  FileText,
-  User as UserIcon,
-  Compass,
-  Languages,
-  ChevronDown,
-  X,
-  Maximize2,
-  Minimize2,
-  Flame,
-  Mic,
-  MicOff
-} from 'lucide-react';
-import { useAppStore } from '@/store/useAppStore';
-import { useSpeechRecognition } from '@/lib/useSpeechRecognition';
-import { notify } from '@/lib/toast';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import AiMentorChatSkeleton from '@/components/skeletons/AiMentorChatSkeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { notify } from '@/lib/toast';
+import { useSpeechRecognition } from '@/lib/useSpeechRecognition';
+import { useAppStore } from '@/store/useAppStore';
+import {
+  CheckCircle,
+  ChevronDown,
+  Compass,
+  Copy,
+  CornerDownLeft,
+  FileText,
+  Flame,
+  Languages,
+  Maximize2,
+  MessageSquareCode,
+  Mic,
+  MicOff,
+  Minimize2,
+  Paperclip,
+  Plus,
+  Trash2,
+  User as UserIcon,
+  X
+} from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function AiMentorChatPage() {
   const { 
@@ -50,17 +47,24 @@ isMockInterview,
     translateLanguage,
     setTranslateLanguage
   } = useAppStore();
-
+  const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [copiedCodeIdx, setCopiedCodeIdx] = useState<string | null>(null);
   const [attachment, setAttachment] = useState<{ name: string; size: string } | null>(null);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  
+
+useEffect(() => {
+  setIsLoading(false);
+}, []);
+
 
   useEffect(() => {
     setMounted(true);
   }, []);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -94,7 +98,9 @@ isMockInterview,
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeConv?.messages]);
-
+  if (isLoading) {
+  return <AiMentorChatSkeleton />;
+}
   // early return for distraction-free Reading Mode
   if (isReadingMode && activeReadingMessageId) {
     const readingMsg = activeConv?.messages.find((m) => m.id === activeReadingMessageId);
