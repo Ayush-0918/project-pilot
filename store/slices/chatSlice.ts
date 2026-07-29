@@ -11,6 +11,7 @@ import { saveConversation } from "@/app/actions/chatActions";
 export interface ChatSlice {
   conversations: ChatConversation[];
   activeConversationId: string | null;
+  isGenerating: boolean;
 
   isRoastMode: boolean;
   toggleRoastMode: () => void;
@@ -59,6 +60,8 @@ export const createChatSlice =
   conversations: INITIAL_CONVERSATIONS,
 
   activeConversationId: "conv-1",
+
+  isGenerating: false,
 
   isRoastMode: false,
   toggleRoastMode: () => set((state) => {
@@ -233,7 +236,7 @@ export const createChatSlice =
           );
  
         }
- 
+
         catch(error){
 
           console.error(error);
@@ -282,11 +285,16 @@ export const createChatSlice =
 
         }
 
+        finally {
+          set({ isGenerating: false });
+        }
+
       })();
 
       return{
 
-        conversations:updatedConversationsWithAi
+        conversations:updatedConversationsWithAi,
+        isGenerating: true
 
       };
 
