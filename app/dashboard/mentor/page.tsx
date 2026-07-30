@@ -1,6 +1,7 @@
 'use client';
 
 import AiMentorChatSkeleton from '@/components/skeletons/AiMentorChatSkeleton';
+import TypingIndicator from '@/components/ai/TypingIndicator';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -43,10 +44,11 @@ export default function AiMentorChatPage() {
     setReadingMode,
     isRoastMode,
     toggleRoastMode,
-isMockInterview,
+    isMockInterview,
     toggleMockInterview,
     translateLanguage,
-    setTranslateLanguage
+    setTranslateLanguage,
+    isGenerating
   } = useAppStore();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -506,6 +508,19 @@ useEffect(() => {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {activeConv?.messages.map((msg) => {
             const isUser = msg.role === 'user';
+            
+            if (!isUser && !msg.content.trim()) {
+              const isLastMessage = activeConv.messages[activeConv.messages.length - 1].id === msg.id;
+              if (isGenerating && isLastMessage) {
+                return (
+                  <div key={msg.id} className="flex space-x-4 justify-start">
+                    <TypingIndicator />
+                  </div>
+                );
+              }
+              return null;
+            }
+
             const scoreMatch = !isUser ? msg.content.match(/(?:^|\n)\s*Score\s*:\s*(10|[0-9])\s*\/\s*10/i) : null;
             const score = scoreMatch ? Number(scoreMatch[1]) : null;
             const isFinalReport = !isUser && /Overall Score/i.test(msg.content) && /Strengths/i.test(msg.content) && /Weaknesses/i.test(msg.content) && /Topics to Improve/i.test(msg.content) && /Hiring Recommendation/i.test(msg.content);

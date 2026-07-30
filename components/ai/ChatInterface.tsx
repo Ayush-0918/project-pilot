@@ -5,6 +5,7 @@ import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/Button';
 import { Send, Sparkles, AlertTriangle, RefreshCw, Brain } from 'lucide-react';
+import TypingIndicator from './TypingIndicator';
 
 export default function ChatInterface() {
   const chatData = useChat() as any;
@@ -55,36 +56,51 @@ export default function ChatInterface() {
     <div className="flex flex-col h-full bg-[#070514] text-slate-100 p-6 rounded-2xl border border-white/15">
       {/* Messages container */}
       <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-        {messages.map((m: any) => (
-          <div
-            key={m.id}
-            className={`flex flex-col space-y-1.5 p-4 rounded-xl text-xs sm:text-sm ${
-              m.role === 'user'
-                ? 'ml-auto bg-indigo-600/20 border border-indigo-500/30 text-white max-w-[80%]'
-                : 'mr-auto bg-white/5 border border-white/15 text-slate-200 max-w-[80%]'
-            }`}
-          >
-            <span className="font-bold text-[10px] text-indigo-300 uppercase tracking-wider">
-              {m.role === 'user' ? 'You' : 'ProjectPilot AI'}
-            </span>
-            <div className="prose prose-invert max-w-none text-xs leading-relaxed">
-              <ReactMarkdown>{m.content}</ReactMarkdown>
-            </div>
-            {m.role !== 'user' && (
-              <div className="pt-2 flex justify-start border-t border-white/5">
-                <button
-                  type="button"
-                  onClick={() => sendMessage({ content: "Rewrite your previous response in extremely simple terms, using analogies suitable for a 15-year-old beginner.", role: 'user' } as any)}
-                  className="flex items-center gap-1.5 text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors font-medium cursor-pointer"
-                  title="Explain Like I'm 15"
-                >
-                  <Brain className="w-3.5 h-3.5" />
-                  <span>Explain Like I'm 15</span>
-                </button>
+        {messages.map((m: any) => {
+          if (m.role !== 'user' && !m.content.trim()) {
+            return (
+              <div key={m.id} className="mr-auto max-w-[80%]">
+                <TypingIndicator />
               </div>
-            )}
+            );
+          }
+          return (
+            <div
+              key={m.id}
+              className={`flex flex-col space-y-1.5 p-4 rounded-xl text-xs sm:text-sm ${
+                m.role === 'user'
+                  ? 'ml-auto bg-indigo-600/20 border border-indigo-500/30 text-white max-w-[80%]'
+                  : 'mr-auto bg-white/5 border border-white/15 text-slate-200 max-w-[80%]'
+              }`}
+            >
+              <span className="font-bold text-[10px] text-indigo-300 uppercase tracking-wider">
+                {m.role === 'user' ? 'You' : 'ProjectPilot AI'}
+              </span>
+              <div className="prose prose-invert max-w-none text-xs leading-relaxed">
+                <ReactMarkdown>{m.content}</ReactMarkdown>
+              </div>
+              {m.role !== 'user' && (
+                <div className="pt-2 flex justify-start border-t border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => sendMessage({ content: "Rewrite your previous response in extremely simple terms, using analogies suitable for a 15-year-old beginner.", role: 'user' } as any)}
+                    className="flex items-center gap-1.5 text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors font-medium cursor-pointer"
+                    title="Explain Like I'm 15"
+                  >
+                    <Brain className="w-3.5 h-3.5" />
+                    <span>Explain Like I'm 15</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
+          <div className="mr-auto max-w-[80%]">
+            <TypingIndicator />
           </div>
-        ))}
+        )}
 
         {/* Friendly Error State & Timeout Fallback UI */}
         {(error || isTimedOut) && (

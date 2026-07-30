@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, Trash2, Send, Bot, User, Brain } from 'lucide-react';
+import TypingIndicator from '../ai/TypingIndicator';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -206,13 +207,25 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
             </p>
           </div>
         ) : (
-          messages.map((m, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 max-w-[85%] ${
-                m.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'
-              }`}
-            >
+          messages.map((m, index) => {
+            if (m.role !== 'user' && !m.content.trim()) {
+              const isLastMessage = messages[messages.length - 1] === m;
+              if (isSending && isLastMessage) {
+                return (
+                  <div key={index} className="flex items-start gap-3 max-w-[85%] mr-auto">
+                    <TypingIndicator />
+                  </div>
+                );
+              }
+              return null;
+            }
+            return (
+              <div
+                key={index}
+                className={`flex items-start gap-3 max-w-[85%] ${
+                  m.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'
+                }`}
+              >
               <div
                 className={`rounded-xl p-2 shrink-0 ${
                   m.role === 'user'
@@ -265,7 +278,8 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
                 )}
               </div>
             </div>
-          ))
+            )
+          })
         )}
         <div ref={scrollRef} />
       </div>

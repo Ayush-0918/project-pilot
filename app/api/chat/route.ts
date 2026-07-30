@@ -111,6 +111,9 @@ Let me know if you would like a code snippet or a step-by-step roadmap for this 
       const textEncoder = new TextEncoder();
       const stream = new ReadableStream({
         async start(controller) {
+          // Introduce a 2.5-second simulated "thinking" delay to display the typing animation
+          await new Promise((resolve) => setTimeout(resolve, 2500));
+
           const words = mockText.split(' ');
           for (const word of words) {
             controller.enqueue(textEncoder.encode(word + ' '));
