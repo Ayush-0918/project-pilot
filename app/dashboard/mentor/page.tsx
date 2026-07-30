@@ -25,7 +25,8 @@ import {
   Plus,
   Trash2,
   User as UserIcon,
-  X
+  X,
+  Brain
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -617,6 +618,20 @@ useEffect(() => {
                       <pre className="font-mono text-xs text-indigo-300 overflow-x-auto p-4 rounded-b-lg rounded-t-none leading-relaxed">
                         {msg.codeSnippet.code}
                       </pre>
+                    </div>
+                  )}
+
+                  {!isUser && !isFinalReport && (
+                    <div className="pt-2 flex justify-start border-t border-white/5 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => sendMessage("Rewrite your previous response in extremely simple terms, using analogies suitable for a 15-year-old beginner.")}
+                        className="flex items-center gap-1.5 text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors font-semibold cursor-pointer"
+                        title="Explain Like I'm 15"
+                      >
+                        <Brain className="w-3.5 h-3.5" />
+                        <span>Explain Like I'm 15</span>
+                      </button>
                     </div>
                   )}
 
