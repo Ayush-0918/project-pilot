@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { CustomCursor } from '@/components/ui/CustomCursor';
 import {
@@ -30,21 +31,50 @@ import { Github } from '@/components/ui/BrandIcons';
 // Enable Incremental Static Regeneration (ISR) - revalidate every 60 seconds
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  try {
+    const publicUsers = await prisma.user.findMany({
+      where: {
+        portfolioPublic: true,
+        username: { not: null }
+      },
+      select: {
+        username: true
+      }
+    });
+
+    return publicUsers.map((user) => ({
+      username: user.username as string
+    }));
+  } catch (error) {
+    console.error("Error generating static params for public portfolios:", error);
+    return [];
+  }
+}
+
 interface PublicPortfolioProps {
   params: Promise<{ username: string }>;
 }
 
-async function getPortfolioData(username: string) {
-  try {
-    // Query the User model directly and include projects
-    const user = await prisma.user.findUnique({
+const getCachedUser = unstable_cache(
+  async (username: string) => {
+    return prisma.user.findUnique({
       where: { username },
       include: {
         projects: true,
       },
     });
+  },
+  ['public-portfolio-user'],
+  { revalidate: 60, tags: ['public-portfolio'] }
+);
 
-    if (!user) return null;
+async function getPortfolioData(username: string) {
+  try {
+    // Query the cached User model directly and include projects
+    const user = await getCachedUser(username);
+
+    if (!user || !user.portfolioPublic) return null;
 
     return {
       fullName: user.fullName || 'Yogender Verma',
