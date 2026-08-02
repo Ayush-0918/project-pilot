@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 vi.mock('@/app/actions/projectActions', () => ({
   toggleProjectMilestoneInDb: vi.fn(),
   createActivityInDb: vi.fn(),
-  saveProjectToDb: vi.fn(),
+  saveProjectToDb: vi.fn(() => Promise.resolve({ success: true, project: {} })),
   reorderProjectMilestonesInDb: vi.fn(),
 }));
 
@@ -138,14 +138,15 @@ describe('useAppStore (Zustand Global Store)', () => {
       expect(useAppStore.getState().selectedProjectId).toBe('project-99');
     });
 
-    it('should add a custom project correctly', () => {
-      const initialProjectsCount = useAppStore.getState().projects.length;
-      
+    it('should add a custom project correctly', async () => {
+      const { projects: initialProjects } = useAppStore.getState();
+      const initialProjectsCount = initialProjects.length;
+
       const customProject = {
         id: 'custom-proj-1',
         title: 'Custom Test Project',
-        tagline: 'Short description',
-        description: 'Detailed description',
+        tagline: 'Custom test',
+        description: 'Test description',
         difficulty: 'Intermediate' as const,
         duration: '3 weeks',
         resumeValue: 90,
@@ -161,7 +162,7 @@ describe('useAppStore (Zustand Global Store)', () => {
         category: 'Web' as const,
       };
 
-      useAppStore.getState().addCustomProject(customProject);
+      await useAppStore.getState().addCustomProject(customProject);
       
       const { projects } = useAppStore.getState();
       expect(projects.length).toBe(initialProjectsCount + 1);
