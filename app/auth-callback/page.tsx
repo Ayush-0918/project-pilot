@@ -32,7 +32,7 @@ let syncedDbUser = null;
 
   // If this account was soft-deleted, send them to the recovery prompt
   // instead of straight into the dashboard.
-  if (syncedDbUser && syncedDbUser.deletedAt) {
+  if (syncedDbUser && 'deletedAt' in syncedDbUser && syncedDbUser.deletedAt) {
     redirect('/restore-account');
   }
 
