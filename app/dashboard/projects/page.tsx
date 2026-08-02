@@ -184,23 +184,27 @@ export default function RecommendedProjectsPage() {
 
         {/* Search Field */}
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <label htmlFor="project-search" className="sr-only">Search projects</label>
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
           <input
-            type="text"
+            id="project-search"
+            type="search"
             placeholder="Search projects or technologies..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#0a071a]/50 text-xs rounded-xl border border-white/5 px-4 py-3 pl-11 focus:outline-none focus:border-indigo-500/55 text-slate-200 placeholder-slate-500"
+            className="w-full bg-[#0a071a]/50 text-xs rounded-xl border border-white/5 px-4 py-3 pl-11 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus:border-indigo-500/55 text-slate-200 placeholder-slate-500"
           />
         </div>
 
         {/* Tab Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto" role="group" aria-label="Filter projects by difficulty">
           {(['All', 'Beginner', 'Intermediate', 'Advanced'] as const).map((tab) => (
             <button
               key={tab}
+              type="button"
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${activeTab === tab
+              aria-pressed={activeTab === tab}
+              className={`px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeTab === tab
                 ? 'bg-indigo-600/15 border-indigo-500/30 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.05)]'
                 : 'bg-transparent border-white/5 text-slate-400 hover:text-white hover:bg-white/2'
                 }`}
@@ -212,11 +216,12 @@ export default function RecommendedProjectsPage() {
 
         {/* Sort Trigger */}
         <div className="flex items-center space-x-2.5 w-full md:w-auto border-t md:border-t-0 border-white/5 pt-3 md:pt-0 justify-between">
-          <span className="text-xs text-slate-500 font-mono uppercase tracking-wider shrink-0">Sort By:</span>
+          <label htmlFor="project-sort" className="text-xs text-slate-500 font-mono uppercase tracking-wider shrink-0">Sort By:</label>
           <select
+            id="project-sort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="text-xs font-semibold rounded-xl border px-3 py-2.5 focus:outline-none focus:border-indigo-500/55 cursor-pointer"
+            className="text-xs font-semibold rounded-xl border px-3 py-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus:border-indigo-500/55 cursor-pointer"
             style={{ backgroundColor: 'var(--surface-secondary)', borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}
           >
             <option value="resumeValue">Resume Value Rank</option>

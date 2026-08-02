@@ -92,7 +92,7 @@ export function ProjectControls({
             </select>
           </label>
 
-          <div className="flex rounded-xl border border-white/10 bg-[#0a071a]/70 p-1" aria-label="Project view">
+          <div className="flex rounded-xl border border-white/10 bg-[#0a071a]/70 p-1" role="group" aria-label="Project view">
             <button
               type="button"
               onClick={() => onViewChange('grid')}
@@ -127,7 +127,7 @@ export function ProjectControls({
               type="button"
               onClick={() => onStatusChange(option)}
               aria-pressed={status === option}
-              className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-all ${
+              className={`rounded-xl border px-3 py-2 text-xs font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                 status === option
                   ? 'border-indigo-500/30 bg-indigo-600/15 text-indigo-300'
                   : 'border-white/5 bg-transparent text-slate-400 hover:bg-white/[0.03] hover:text-white'
@@ -146,9 +146,9 @@ export function ProjectControls({
             type="button"
             onClick={onClear}
             disabled={!hasActiveFilters}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-35"
           >
-            <RotateCcw className="h-3.5 w-3.5" />
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             Clear filters
           </button>
         </div>
