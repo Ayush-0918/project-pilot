@@ -135,7 +135,7 @@ export async function saveProjectToDb(data: ProjectPayload) {
     });
 
     if (!dbUser) {
-      throw new Error('User record not found in database.');
+      return { success: false, errorType: 'AUTH', message: 'User record not found in database.' };
     }
 
     const savedProject = await prisma.project.upsert({
@@ -171,25 +171,38 @@ export async function saveProjectToDb(data: ProjectPayload) {
       });
     }
 
-    return savedProject;
-  } catch (error) {
+    return { success: true, project: savedProject };
+  } catch (error: any) {
     console.error('Failed to save project details to database:', error);
     
     if (process.env.NODE_ENV === 'development') {
       console.warn('Postgres offline. Bypassing saveProjectToDb in offline-mode.');
       return {
-        id: data.id,
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        progress: data.progress,
-        tags: data.tags,
-        roadmap: data.roadmap,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        success: true,
+        project: {
+          id: data.id,
+          title: data.title,
+          description: data.description,
+          status: data.status,
+          progress: data.progress,
+          tags: data.tags,
+          roadmap: data.roadmap,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
       };
     }
-    throw error;
+
+    let errorType = 'UNKNOWN';
+    if (error.message?.includes('Unauthenticated')) {
+      errorType = 'AUTH';
+    } else if (error.code && error.code.startsWith('P2')) {
+      errorType = 'VALIDATION';
+    } else {
+      errorType = 'SERVER';
+    }
+
+    return { success: false, errorType, message: error.message || 'An unknown error occurred.' };
   }
 }
 

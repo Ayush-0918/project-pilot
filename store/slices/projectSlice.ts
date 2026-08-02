@@ -17,7 +17,7 @@ export interface ProjectSlice {
 
   setProjects: (projects: Project[]) => void;
   selectProject: (id: string | null) => void;
-  addCustomProject: (project: Project) => void;
+  addCustomProject: (project: Project) => Promise<void>;
 
   setActivities: (activities: ProjectActivity[]) => void;
 
@@ -29,7 +29,7 @@ export interface ProjectSlice {
   ) => void;
   reorderSteps: (projectId: string, fromIndex: number, toIndex: number) => void;
 
-  initializeRoadmap: (projectId: string, title: string) => void;
+  initializeRoadmap: (projectId: string, title: string) => Promise<void>;
 }
 
 export const createProjectSlice = (
@@ -44,25 +44,32 @@ export const createProjectSlice = (
 
   selectProject: (id) => set({ selectedProjectId: id }),
 
-  addCustomProject: (newProject) =>
-    set((state: ProjectSlice) => {
-      const updatedProjects = [newProject, ...state.projects];
+  addCustomProject: async (newProject) => {
+    const res = await saveProjectToDb({
+      id: newProject.id,
+      title: newProject.title,
+      description: newProject.description || undefined,
+      status: newProject.status || "Planned",
+      progress: newProject.progress || 0,
+      tags: newProject.technologies || [],
+    });
 
-      saveProjectToDb({
-        id: newProject.id,
-        title: newProject.title,
-        description: newProject.description || undefined,
-        status: newProject.status || "Planned",
-        progress: newProject.progress || 0,
-        tags: newProject.technologies || [],
-      });
+    if (res && !res.success) {
+      throw res;
+    }
 
-      createActivityInDb(
+    try {
+      await createActivityInDb(
         newProject.id,
         `Created project: ${newProject.title}`,
         "project_created"
       );
+    } catch (e) {
+      console.warn("Failed to log activity to DB");
+    }
 
+    set((state: ProjectSlice) => {
+      const updatedProjects = [newProject, ...state.projects];
       const newActivity: ProjectActivity = {
         id: `activity-${Date.now()}`,
         type: "project_created",
@@ -77,7 +84,8 @@ export const createProjectSlice = (
         selectedProjectId: newProject.id,
         activities: [newActivity, ...state.activities],
       };
-    }),
+    });
+  },
 
   activities: [],
 
@@ -203,103 +211,112 @@ export const createProjectSlice = (
       };
     }),
 
-  initializeRoadmap: (projectId, title) =>
-    set((state: ProjectSlice) => {
-      if (state.roadmaps[projectId]) return {};
+  initializeRoadmap: async (projectId, title) => {
+    const state = get();
+    if (state.roadmaps[projectId]) return;
 
-      const newSteps = [
-        {
-          id: "step-1",
-          title: "Project Inception & Architecture Planning",
-          duration: "Days 1-2",
-          description:
-            "Establish repository structure, select frameworks,draft API endpoints, and define exact schemas.",
-          tasks: [
-            "Initialize clean Git repository",
-            "Create basic workspace outline",
-            "Write design doc outlining core endpoints",
-          ],
-          completed: false,
-          type: "fundamentals" as const,
-        },
-        {
-          id: "step-2",
-          title: "UI Design & Frontend Shell Implementation",
-          duration: "Days 3-6",
-          description:
-            "Build core application pages, setup styling tokens, configure responsive grids, and design key page cards.",
-          tasks: [
-            "Build global responsive navbar",
-            "Draft layout shells with skeleton loaders",
-            "Integrate Tailwind variables for themes",
-          ],
-          completed: false,
-          type: "frontend" as const,
-        },
-        {
-          id: "step-3",
-          title: "Core Backend Logics & DB Integration",
-          duration: "Days 7-12",
-          description:
-            "Establish database connections, build backend api pipelines, run queries, and setup schemas.",
-          tasks: [
-            "Create basic backend models",
-            "Verify database connections",
-            "Test controllers with robust error handlers",
-          ],
-          completed: false,
-          type: "backend" as const,
-        },
-        {
-          id: "step-4",
-          title: "API Integrations & Custom Features",
-          duration: "Days 13-16",
-          description:
-            "Integrate external AI model endpoints, webhook handlers, and other special feature engines.",
-          tasks: [
-            "Integrate OpenAI/anthropic API calls",
-            "Build webhook routes for payments or git hooks",
-            "Connect storage servers (S3/Cloudinary)",
-          ],
-          completed: false,
-          type: "integration" as const,
-        },
-        {
-          id: "step-5",
-          title: "Deployments & Recruiter Handshakes",
-          duration: "Days 17-20",
-          description:
-            "Launch application to production, set SSL configs,run unit tests, and prepare markdown portfolios.",
-          tasks: [
-            "Deploy to Vercel/Railway",
-            "Run lighthouse tests and optimize assets",
-            "Create detailed README.md for recruiter eyes",
-          ],
-          completed: false,
-          type: "deployment" as const,
-        },
-      ];
+    const newSteps = [
+      {
+        id: "step-1",
+        title: "Project Inception & Architecture Planning",
+        duration: "Days 1-2",
+        description:
+          "Establish repository structure, select frameworks,draft API endpoints, and define exact schemas.",
+        tasks: [
+          "Initialize clean Git repository",
+          "Create basic workspace outline",
+          "Write design doc outlining core endpoints",
+        ],
+        completed: false,
+        type: "fundamentals" as const,
+      },
+      {
+        id: "step-2",
+        title: "UI Design & Frontend Shell Implementation",
+        duration: "Days 3-6",
+        description:
+          "Build core application pages, setup styling tokens, configure responsive grids, and design key page cards.",
+        tasks: [
+          "Build global responsive navbar",
+          "Draft layout shells with skeleton loaders",
+          "Integrate Tailwind variables for themes",
+        ],
+        completed: false,
+        type: "frontend" as const,
+      },
+      {
+        id: "step-3",
+        title: "Core Backend Logics & DB Integration",
+        duration: "Days 7-12",
+        description:
+          "Establish database connections, build backend api pipelines, run queries, and setup schemas.",
+        tasks: [
+          "Create basic backend models",
+          "Verify database connections",
+          "Test controllers with robust error handlers",
+        ],
+        completed: false,
+        type: "backend" as const,
+      },
+      {
+        id: "step-4",
+        title: "API Integrations & Custom Features",
+        duration: "Days 13-16",
+        description:
+          "Integrate external AI model endpoints, webhook handlers, and other special feature engines.",
+        tasks: [
+          "Integrate OpenAI/anthropic API calls",
+          "Build webhook routes for payments or git hooks",
+          "Connect storage servers (S3/Cloudinary)",
+        ],
+        completed: false,
+        type: "integration" as const,
+      },
+      {
+        id: "step-5",
+        title: "Deployments & Recruiter Handshakes",
+        duration: "Days 17-20",
+        description:
+          "Launch application to production, set SSL configs,run unit tests, and prepare markdown portfolios.",
+        tasks: [
+          "Deploy to Vercel/Railway",
+          "Run lighthouse tests and optimize assets",
+          "Create detailed README.md for recruiter eyes",
+        ],
+        completed: false,
+        type: "deployment" as const,
+      },
+    ];
 
-      const projectData = state.projects.find((p: Project) => p.id === projectId);
+    const projectData = state.projects.find((p: Project) => p.id === projectId);
 
-      if (projectData) {
-        saveProjectToDb({
-          id: projectId,
-          title: projectData.title,
-          description: projectData.description || undefined,
-          status: "Planned",
-          progress: 0,
-          tags: projectData.technologies,
-          roadmap: newSteps,
-        });
+    if (projectData) {
+      const res = await saveProjectToDb({
+        id: projectId,
+        title: projectData.title,
+        description: projectData.description || undefined,
+        status: "Planned",
+        progress: 0,
+        tags: projectData.technologies,
+        roadmap: newSteps,
+      });
 
-        createActivityInDb(
+      if (res && !res.success) {
+        throw res;
+      }
+
+      try {
+        await createActivityInDb(
           projectId,
           `Initialized Blueprint: ${title}`,
           "project_start"
         );
+      } catch (e) {
+        console.warn("Failed to log activity to DB");
       }
+    }
 
+    set((state: ProjectSlice) => {
       const newActivity: ProjectActivity = {
         id: `local-${Date.now()}-${projectId}`,
         type: "project_start",
@@ -321,5 +338,6 @@ export const createProjectSlice = (
           },
         },
       };
-    }),
+    });
+  },
 });
