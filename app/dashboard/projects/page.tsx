@@ -245,13 +245,14 @@ export default function RecommendedProjectsPage() {
           />
         ) : filteredProjects.length === 0 ? (
           <EmptyState
-            title="No Matching Projects"
+            title="No matching projects found"
             description="No projects match your current search and difficulty filters. Clear the filters to view all available recommendations."
-            icon={<Search className="h-10 w-10 sm:h-12 sm:w-12" />}
+            icon={<Search className="h-10 w-10 sm:h-12 sm:w-12 text-slate-400" />}
             ctaLabel="Clear Filters"
             onClick={() => {
               setSearchQuery('');
               setActiveTab('All');
+              setSortBy('resumeValue');
             }}
           />
         ) : (
