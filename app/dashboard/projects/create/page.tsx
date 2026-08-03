@@ -13,7 +13,9 @@ import {
   Wand2,
   Layers,
   Code2,
-  Target
+  Target,
+  AlertCircle,
+  RefreshCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAppStore } from '@/store/useAppStore';
@@ -43,6 +45,7 @@ export default function CreateProjectPage() {
   // Form Validation & Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [titleError, setTitleError] = useState('');
+  const [createError, setCreateError] = useState<{ message: string; type: string } | null>(null);
 
   // Handle AI Name Generation
   const handleGenerateNames = async () => {
@@ -82,14 +85,15 @@ export default function CreateProjectPage() {
     setTimeout(() => setHighlightTitle(false), 1200);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!title.trim()) {
       setTitleError('Project Title is required.');
       return;
     }
 
     setIsSubmitting(true);
+    setCreateError(null);
 
     try {
       const newId = `custom-project-${Date.now()}`;
@@ -126,17 +130,39 @@ export default function CreateProjectPage() {
         updatedAt: new Date(),
       };
 
-      addCustomProject(newProject);
+      await addCustomProject(newProject);
       selectProject(newId);
-      initializeRoadmap(newId, newProject.title);
+      await initializeRoadmap(newId, newProject.title);
 
       router.push(`/dashboard/projects`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create custom project:', err);
+      let errorType = 'UNKNOWN';
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+
+      if (err.errorType) {
+        errorType = err.errorType;
+        if (errorType === 'AUTH') {
+          errorMessage = 'You must be logged in to create a project. Please check your session.';
+        } else if (errorType === 'VALIDATION') {
+          errorMessage = 'Invalid project data provided. Please check your inputs.';
+        } else if (errorType === 'SERVER') {
+          errorMessage = 'The server encountered an error while processing your request.';
+        }
+      } else if (err.message && (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Network'))) {
+        errorType = 'NETWORK';
+        errorMessage = 'Network connection failed. Please check your internet connection.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setCreateError({ type: errorType, message: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const isRetryable = createError?.type === 'NETWORK' || createError?.type === 'SERVER';
 
   return (
     <div className="space-y-8 pb-12 max-w-4xl mx-auto">
@@ -161,6 +187,29 @@ export default function CreateProjectPage() {
             </div>
           </div>
         </div>
+
+        {createError && (
+          <div className="mb-6 p-4 rounded-xl border border-rose-500/30 bg-rose-500/10 flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4">
+            <div className="flex items-start sm:items-center gap-3 text-rose-200">
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5 sm:mt-0" />
+              <div>
+                <p className="text-sm font-semibold text-rose-300">Project Creation Failed</p>
+                <p className="text-xs mt-0.5 text-rose-200/80">{createError.message}</p>
+              </div>
+            </div>
+            {isRetryable && (
+              <Button
+                type="button"
+                onClick={() => handleSubmit()}
+                disabled={isSubmitting}
+                className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 shrink-0"
+              >
+                <RefreshCcw className="w-4 h-4 mr-2" />
+                Retry
+              </Button>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* AI NAME GENERATOR SECTION */}
