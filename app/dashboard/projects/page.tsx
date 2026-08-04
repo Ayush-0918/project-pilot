@@ -6,6 +6,7 @@ import {
   type ProjectView
 } from '@/components/projects/ProjectControls';
 import RecommendedProjectsSkeleton from '@/components/skeletons/RecommendedProjectsSkeleton';
+import { ProjectCardSkeleton } from '@/components/skeletons/ProjectCardSkeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardFooter } from '@/components/ui/Card';
@@ -428,35 +429,7 @@ export default function RecommendedProjectsPage() {
                   exit={{ opacity: 0, y: 10 }}
                   className="h-full"
                 >
-                  <Card className="bg-[#08051e]/40 h-full flex flex-col justify-between relative border border-white/5 p-6 animate-pulse">
-                    <div className="space-y-4 w-full">
-                      <div className="flex items-center justify-between">
-                        <div className="h-6 w-20 bg-white/10 rounded-full"></div>
-                        <div className="h-4 w-16 bg-white/10 rounded"></div>
-                      </div>
-                      <div>
-                        <div className="h-6 w-3/4 bg-white/10 rounded mb-2"></div>
-                        <div className="h-3 w-1/4 bg-white/10 rounded"></div>
-                      </div>
-                      <div className="h-8 w-full bg-indigo-500/10 rounded-xl"></div>
-                      <div className="space-y-2">
-                        <div className="h-3 w-full bg-white/10 rounded"></div>
-                        <div className="h-3 w-5/6 bg-white/10 rounded"></div>
-                        <div className="h-3 w-4/6 bg-white/10 rounded"></div>
-                      </div>
-                      <div className="space-y-2 mt-4">
-                        <div className="h-2 w-20 bg-white/10 rounded"></div>
-                        <div className="flex gap-2">
-                          <div className="h-4 w-12 bg-white/10 rounded"></div>
-                          <div className="h-4 w-16 bg-white/10 rounded"></div>
-                          <div className="h-4 w-14 bg-white/10 rounded"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="pt-6 border-t border-white/5 mt-6">
-                      <div className="h-11 w-full bg-white/10 rounded-xl"></div>
-                    </div>
-                  </Card>
+                  <ProjectCardSkeleton />
                 </motion.div>
               ))}
             </div>
