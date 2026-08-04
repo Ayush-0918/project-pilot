@@ -7,6 +7,7 @@ const dotTransition = {
   repeat: Infinity,
   repeatType: "reverse" as const,
   ease: "easeInOut" as const
+  ease: "easeInOut" as any
 };
 
 export function TypingIndicator() {
