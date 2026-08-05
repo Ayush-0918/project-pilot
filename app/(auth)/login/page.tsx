@@ -30,6 +30,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as zod from "zod";
 
+const COPYRIGHT_YEAR = 2026;
+
 const loginSchema = zod.object({
   email: zod.string().email("Please enter a valid email address"),
   password: zod.string().min(6, "Password must be at least 6 characters"),
@@ -155,7 +157,7 @@ export default function LoginPage() {
         {/* Footer info */}
         <div className="text-xs text-slate-500 font-mono z-10 flex justify-between">
           <span>SECURE IDENTITY GATEWAY</span>
-          <span>&copy; {new Date().getFullYear()}</span>
+          <span>&copy; {COPYRIGHT_YEAR}</span>
         </div>
       </div>
 
