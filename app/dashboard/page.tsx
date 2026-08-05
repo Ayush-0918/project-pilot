@@ -360,14 +360,14 @@ export default function MainDashboardPage() {
             />
           </CardContent>
           <CardFooter className="pt-2 flex items-center justify-between text-xs text-slate-400">
-            <span>Core Match rate: 78%</span>
-            <Link
-              href="/dashboard/career"
-              className="text-indigo-400 font-semibold hover:underline flex items-center"
-            >
-              Detailed breakdown <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
-            </Link>
-          </CardFooter>
+  <span>Core Match rate: {careerScore.overallScore}%</span>
+  <Link
+    href="/dashboard/career"
+    className="text-indigo-400 font-semibold hover:underline flex items-center"
+  >
+    Detailed breakdown <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+  </Link>
+</CardFooter>
         </Card>
 
         {/* WIDGET 2: CAREER READINESS SUMMARY & HIGHLIGHT METRICS */}
