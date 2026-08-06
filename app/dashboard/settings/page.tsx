@@ -220,21 +220,25 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>((user as any)?.imageUrl || null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const isUploading = false;
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleSaveAvatar = async () => {
-    if (!previewUrl) return;
+  if (!previewUrl) return;
 
-    updateAvatar(previewUrl);
+  setIsUploading(true);
 
-    try {
-      await updateProfileAvatar(previewUrl);
-      toast.success("Avatar updated successfully.");
-      setAvatarFile(null);
-    } catch {
-      toast.error("Failed to update avatar.");
-    }
-  };
+  updateAvatar(previewUrl);
+
+  try {
+    await updateProfileAvatar(previewUrl);
+    toast.success("Avatar updated successfully.");
+    setAvatarFile(null);
+  } catch {
+    toast.error("Failed to update avatar.");
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const handleAvatarSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
