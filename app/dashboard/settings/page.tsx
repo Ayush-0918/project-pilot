@@ -445,7 +445,7 @@ export default function SettingsPage() {
 }
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-8 pb-12 px-6 sm:px-4 overflow-x-hidden">
       <div>
         <h2
           className="text-2xl font-bold flex items-center space-x-2"

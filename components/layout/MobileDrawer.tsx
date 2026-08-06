@@ -150,7 +150,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
     <AnimatePresence>
       {isOpen && (
         <div
-          className="fixed inset-0 z-[9999] md:hidden flex"
+          className="fixed inset-0 z-[9999] :hidden flex"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile Navigation Drawer"

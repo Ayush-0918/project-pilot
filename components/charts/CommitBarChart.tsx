@@ -21,9 +21,9 @@ interface CommitBarChartProps {
 
 export const CommitBarChart: React.FC<CommitBarChartProps> = ({ data }) => {
   return (
-    <div className="w-full h-full outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none [&_svg]:outline-none select-none">
+    <div className="w-full min-w-0 h-full outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none [&_svg]:outline-none select-none">
       <ResponsiveContainer width="100%" height="100%" style={{ outline: 'none' }}>
-        <BarChart data={data} style={{ outline: 'none' }}>
+        <BarChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }} style={{ outline: 'none' }}>
           <XAxis dataKey="day" stroke="var(--text-secondary)" fontSize={11} tickLine={false} axisLine={false} />
           <YAxis stroke="var(--text-secondary)" fontSize={10} tickLine={false} axisLine={false} />
           <Tooltip

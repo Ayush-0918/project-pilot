@@ -116,7 +116,7 @@ useEffect(() => {
   ] as const;
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="w-full px-4 md:px-6 space-y-8 pb-12 overflow-x-hidden">
       {/* Back to catalog button */}
       <button 
         onClick={() => router.push('/dashboard/projects')}
@@ -127,10 +127,10 @@ useEffect(() => {
       </button>
 
       {/* Main detail banner */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#0c092c]/75 via-[#08051e]/80 to-transparent border-indigo-500/25 flex flex-col md:flex-row justify-between items-start gap-6 relative overflow-hidden">
+      <div className="glass-panel w-full min-w-0 p-5 sm:p-6 md:p-8 rounded-3xl bg-gradient-to-r from-[#0c092c]/75 via-[#08051e]/80 to-transparent border-indigo-500/25 flex flex-col md:flex-row justify-between items-start gap-6 relative overflow-x-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-purple-600/10 rounded-full blur-[60px] pointer-events-none" />
         
-        <div className="space-y-3.5 flex-1 min-w-0">
+        <div className="space-y-3.5 flex-1 min-w-0 w-full">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="glow" className="bg-indigo-500/10 text-indigo-300 border-indigo-500/20 uppercase tracking-widest text-[9px] font-bold">
               {project.category}
@@ -205,7 +205,7 @@ useEffect(() => {
       </div>
 
       {/* Tab Panels content */}
-      <div className="min-h-96">
+      <div className="min-h-96 min-w-0">
         <AnimatePresence mode="wait">
           
           {/* TAB 1: OVERVIEW */}
@@ -218,7 +218,7 @@ useEffect(() => {
               className="grid grid-cols-1 lg:grid-cols-3 gap-8"
             >
               {/* Left Column: Description & Checklists */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-6 min-w-0">
                 <Card hoverEffect={false}>
                   <CardHeader>
                     <CardTitle className="text-base font-bold">Project Blueprint Specs</CardTitle>
