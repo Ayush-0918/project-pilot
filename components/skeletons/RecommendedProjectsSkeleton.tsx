@@ -2,12 +2,8 @@
 
 import { Card } from '@/components/ui/Card';
 
-const Skeleton = ({ className = '' }: { className?: string }) => (
-  <div
-    className={`animate-pulse rounded-md bg-white/10 ${className}`}
-    aria-hidden="true"
-  />
-);
+import { Skeleton } from '@/components/ui/Skeleton';
+import { ProjectCardSkeleton } from '@/components/skeletons/ProjectCardSkeleton';
 
 export default function RecommendedProjectsSkeleton() {
   return (
@@ -113,6 +109,7 @@ export default function RecommendedProjectsSkeleton() {
               <Skeleton className="h-11 w-full rounded-xl" />
             </div>
           </Card>
+          <ProjectCardSkeleton key={index} />
         ))}
       </div>
 
