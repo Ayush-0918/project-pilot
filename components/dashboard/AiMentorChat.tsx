@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, Trash2, Send, Bot, User, Brain } from 'lucide-react';
 import TypingIndicator from '../ai/TypingIndicator';
+import MarkdownContent from '../ai/MarkdownContent';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -262,7 +263,13 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
     : undefined
 }
               >
-                <div>{m.content}</div>
+                <div>
+                  {m.role === 'user' ? (
+                    m.content
+                  ) : (
+                    <MarkdownContent>{m.content}</MarkdownContent>
+                  )}
+                </div>
                 {m.role !== 'user' && (
                   <div className="pt-2 flex justify-start border-t border-white/5 mt-1">
                     <button
