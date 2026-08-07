@@ -15,7 +15,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         <motion.div
           ref={ref}
           className={cn(
-            'glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300',
+            'glass-panel rounded-2xl p-6 sm:p-4 relative overflow-hidden transition-all duration-300',
             hoverEffect && 'glass-panel-hover',
             className
           )}
@@ -42,7 +42,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300',
+          'glass-panel rounded-2xl p-6 sm:p-4 relative overflow-hidden transition-all duration-300',
           hoverEffect && 'glass-panel-hover',
           className
         )}

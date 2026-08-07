@@ -149,10 +149,10 @@ export default function RecommendedProjectsPage() {
     return <RecommendedProjectsSkeleton />;
   }
   return (
-    <div className="w-full px-4 md:px-6 space-y-6 py-12 sm:space-y-8 overflow-x-hidden">
-      <div className="flex flex-col px-6 sm:px-4 gap-4 sm:flex-row sm:items-start sm:justify-between md:flex-row min-w-0">
+    <div className="w-full space-y-6 sm:space-y-8 overflow-x-hidden">
+      <div className="flex flex-col px-6 gap-4 sm:flex-row sm:items-start sm:justify-between md:flex-row min-w-0">
         <div className="py-6 min-w-0 sm:items-start">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-start space-x-2">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-start space-x-2 min-w-0">
             <FolderGit2 className="w-6 h-6 sm:w-5 sm:h-5 sm:items-start shrink-0 text-indigo-400" />
             <span>Recommended Project blue-prints</span>
           </h2>
@@ -290,10 +290,10 @@ export default function RecommendedProjectsPage() {
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <TiltWrapper className="h-full sm:p-2 min-w-0">
+                    <TiltWrapper className="h-full min-w-0">
                       <Card
                         hoverEffect={false}
-                        className={`relative flex flex-col min-w-0 sm:p-2 justify-between overflow-hidden border bg-[#070519]/95 rounded-2xl h-full transition-all duration-300 ${borderStyles[project.difficulty] || 'border-white/5'
+                        className={`relative flex flex-col min-w-0 justify-between overflow-hidden border bg-[#070519]/95 rounded-2xl h-full transition-all duration-300 ${borderStyles[project.difficulty] || 'border-white/5'
                           } flex h-full flex-col justify-between`}
                         style={{
                           backgroundImage: `
@@ -309,7 +309,7 @@ export default function RecommendedProjectsPage() {
 
                         <div className="space-y-4 min-w-0 w-full">
                           {/* Difficulty / Status / Active Target / Duration — single row */}
-                          <div className="flex min-w-0 items-start justify-between gap-2">
+                          <div className="flex min-w-0 items-center justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge variant={diffColors[project.difficulty] || 'default'}>
                                 {project.difficulty}

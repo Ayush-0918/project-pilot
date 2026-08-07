@@ -241,16 +241,19 @@ export default function DashboardLayout({
      * changes on <html>.  All hard-coded hex colours have been replaced.
      */
     <div
-      className='flex min-h-screen w-full overflow-x-hidden sm:overflow-x-hidden'
+      className='relative flex min-h-screen w-full max-w-full overflow-hidden'
       style={{
         backgroundColor: 'var(--background)',
         color: 'var(--foreground)',
       }}
     >
       {/* Dynamic Background glowing canvas */}
-      <div className='absolute top-[20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none' />
-      <div className='absolute bottom-[20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-[120px] pointer-events-none' />
 
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className='absolute top-[20%] right-0 translate-x-1/2 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none' />
+        <div className='absolute bottom-[20%] left-0 translate-x-1/2 w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-[120px] pointer-events-none' />
+
+      </div>
       {/* Desktop Sidebar (Left Panel) */}
       {!isReadingMode && (
         <Sidebar
@@ -465,7 +468,7 @@ export default function DashboardLayout({
         {/* Main Dashboard Pages Slot (Children content) */}
         <div 
           id="dashboard-content-area"
-          className={isReadingMode ? "flex-1 w-full min-w-0 max-w-full overflow-x-hidden relative z-10" : "flex-1 min-w-0 max-w-full w-full mx-auto px-6 pt-6 sm:px-4 relative z-10 overflow-x-hidden"}
+          className={isReadingMode ? "flex-1 w-full min-w-0 max-w-full overflow-x-hidden relative z-10 md:overflow-x-hidden" : "flex-1 min-w-0 max-w-full w-full mx-auto px-6 pt-6 sm:px-4 relative z-10 overflow-x-hidden md:overflow-x-hidden"}
         >
           <GlobalKeyboardShortcuts 
             onOpenCommandPalette={() => setCommandPaletteOpen((prev) => !prev)}

@@ -54,7 +54,7 @@ export default function RecommendedProjectsSkeleton() {
         {Array.from({ length: 6 }).map((_, index) => (
           <Card
             key={index}
-            className="bg-[#08051e]/40 border border-white/5 rounded-2xl p-6 flex flex-col justify-between"
+            className="bg-[#08051e]/40 border border-white/5 rounded-2xl p-6 sm:p-4 flex flex-col justify-between"
           >
             <div className="space-y-5">
               {/* Badges */}

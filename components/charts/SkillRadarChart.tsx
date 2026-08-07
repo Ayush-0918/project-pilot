@@ -33,26 +33,32 @@ export const SkillRadarChart: React.FC<SkillRadarChartProps> = ({
   friendName
 }) => { 
   // Set outradius breakpoint for responsive design
-  const [outerRadius, setOuterRadius] = useState('56%');
+  const containerRef = React.useRef<HTMLDivElement>(null);
+const [outerRadius, setOuterRadius] = React.useState("50%");
 
-  useEffect(() => {
-    const updateRadius = () => {
-      if (window.innerWidth >= 1024) {
-        setOuterRadius('70%');
-      } else {
-        setOuterRadius('54%');
-      }
-    };
+React.useEffect(() => {
+  if (!containerRef.current) return;
 
-    updateRadius();
-    window.addEventListener('resize', updateRadius);
+  const observer = new ResizeObserver(([entry]) => {
+    const width = entry.contentRect.width;
 
-    return () => window.removeEventListener('resize', updateRadius);
-  }, []);
+    if (width >= 1024) {
+      setOuterRadius("70%");
+    } else if (width >= 768) {
+      setOuterRadius("60%");
+    } else {
+      setOuterRadius("50%");
+    }
+  });
+
+  observer.observe(containerRef.current);
+
+  return () => observer.disconnect();
+}, []);
   return (
-    <div className="w-full h-full outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none [&_svg]:outline-none select-none">
+    <div ref={containerRef} className="w-full h-full min-w-0 min-h-0 outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none [&_svg]:outline-none select-none">
       <ResponsiveContainer width="100%" height="100%" style={{ outline: 'none' }}>
-        <RadarChart className="w-full sm:w-fit h-full overflow-x-hidden" cx="50%" cy="50%" outerRadius={outerRadius} data={data} style={{ outline: 'none' }}>
+        <RadarChart cx="50%" cy="50%" outerRadius={outerRadius} data={data} style={{ outline: 'none' }}>
           <PolarGrid stroke="rgba(255, 255, 255, 0.15)" />
           <PolarAngleAxis
             dataKey="subject"

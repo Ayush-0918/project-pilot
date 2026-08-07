@@ -116,7 +116,7 @@ useEffect(() => {
   ] as const;
 
   return (
-    <div className="w-full px-4 md:px-6 space-y-8 pb-12 overflow-x-hidden">
+    <div className="w-full space-y-8 pb-12 overflow-x-hidden">
       {/* Back to catalog button */}
       <button 
         onClick={() => router.push('/dashboard/projects')}

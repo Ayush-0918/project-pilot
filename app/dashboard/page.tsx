@@ -223,7 +223,7 @@ export default function MainDashboardPage() {
   const activeRecommendedProject = projects[0];
 
   return (
-    <div className="w-full min-w-0 space-y-6 px-3 sm:space-y-8 sm:px-6 lg:px-0 overflow-x-hidden">
+    <div className="w-full min-w-0 space-y-6 sm:space-y-8 lg:px-0 overflow-x-hidden">
       {/* Welcome Banner */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -231,7 +231,7 @@ export default function MainDashboardPage() {
         className="glass-panel rounded-3xl border-indigo-500/25 flex flex-col md:flex-row px-6 sm:px-4 items-start md:items-center justify-between gap-6"
         style={{ backgroundColor: "var(--surface-card)" }}
       >
-        <div className="space-y-2">
+        <div className="space-y-2 py-6 sm:px-6 overflow-x-hidden">
           <div className="flex items-center space-x-2 text-indigo-400">
             <Sparkles
               className="w-4 h-4 animate-spin"
@@ -352,7 +352,7 @@ export default function MainDashboardPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="w-full min-w-0 h-[300px] sm:h-[320px] flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+          <CardContent className="w-full min-w-0 h-[300px] sm:h-[320px] flex items-center justify-center p-2 sm:p-4 overflow-x-hidden">
             <SkillRadarChart
               data={radarData}
               userName={user?.name || clerkUser?.firstName || 'You'}
@@ -524,8 +524,8 @@ export default function MainDashboardPage() {
                 <CardFooter className="pt-2 border-t border-white/5">
                   <Button 
                     variant="glow" 
-                    className="w-full text-xs h-11" 
-                    rightIcon={<ChevronRight className="w-4 h-4" />}
+                    className="w-full sm:px-2 text-xs h-11" 
+                    rightIcon={<ChevronRight className="w-4 h-4 sm:w-3" />}
                     onClick={() => {
                       if (activeRecommendedProject) {
                         selectProject(activeRecommendedProject.id);

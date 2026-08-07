@@ -304,7 +304,7 @@ export default function GitHubAnalyticsPage() {
   const repositoryIntelligence = githubAnalytics?.repositoryIntelligence || [];
 
   return (
-    <div className="space-y-8 pb-12 px-4 sm:px-6 min-w-0 overflow-x-hidden">
+    <div className="space-y-8 pb-12 min-w-0 overflow-x-hidden">
       {/* Page Header */}
       <header className="px-2 py-4 sm:px-0">
         <h1

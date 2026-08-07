@@ -553,30 +553,3 @@ div:has(> .cl-devMode) {
     border-color: #e2e8f0 !important;
   }
 }
-
-/* Small screens */
-@media (max-width: 639px) {
-  :root {
-    --radar-font-size: 9px;
-    --radar-radius: 58%;
-    --radar-legend-size: 9px;
-  }
-}
-
-/* Medium screens */
-@media (min-width: 640px) and (max-width: 1023px) {
-  :root {
-    --radar-font-size: 10px;
-    --radar-radius: 65%;
-    --radar-legend-size: 10px;
-  }
-}
-
-/* Large screens */
-@media (min-width: 1024px) {
-  :root {
-    --radar-font-size: 11px;
-    --radar-radius: 70%;
-    --radar-legend-size: 10px;
-  }
-}

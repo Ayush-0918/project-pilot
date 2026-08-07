@@ -66,7 +66,7 @@ export const Navbar = () => {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full glass-panel border-b backdrop-blur-md"
+      className="sticky top-0 z-50 w-full glass-panel border-b backdrop-blur-md overflow-x-hidden"
       style={{
         backgroundColor: 'color-mix(in srgb, var(--background) 70%, transparent)',
         borderColor: 'var(--border-subtle)',

@@ -445,7 +445,7 @@ export default function SettingsPage() {
 }
 
   return (
-    <div className="space-y-8 pb-12 px-6 sm:px-4 overflow-x-hidden">
+    <div className="space-y-8 pb-12 overflow-x-hidden">
       <div>
         <h2
           className="text-2xl font-bold flex items-center space-x-2"
@@ -504,14 +504,14 @@ export default function SettingsPage() {
                     disabled={isUploading}
                   />
 
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <div className="w-full flex flex-wrap items-center gap-2 pt-1">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
-                      className="h-8 text-[11px] border-white/10 text-slate-300 hover:text-white"
+                      className="w-full h-8 text-[11px] border-white/10 text-slate-300 hover:text-white"
                     >
                       Choose Image
                     </Button>
@@ -523,7 +523,7 @@ export default function SettingsPage() {
                         size="sm"
                         onClick={handleSaveAvatar}
                         disabled={isUploading}
-                        className="h-8 text-[11px] font-semibold flex items-center"
+                        className="h-8 text-[11px] font-semibold flex items-center w-full"
                       >
                         {isUploading ? (
                           <>
@@ -670,7 +670,7 @@ export default function SettingsPage() {
                   <Button
                     type="submit"
                     variant="premium"
-                    className="h-11 px-6 ml-auto text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                    className="h-11 w-full px-6 ml-auto text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                   >
                     Save Profile Changes
                   </Button>
@@ -779,7 +779,7 @@ export default function SettingsPage() {
                     disabled={isExtracting}
                     variant="premium"
                     size="sm"
-                    className="h-9 px-4 text-xs font-semibold"
+                    className="h-9 w-full px-4 text-xs font-semibold"
                   >
                     {isExtracting ? (
                       <>
@@ -805,7 +805,7 @@ export default function SettingsPage() {
                   onClick={handleSaveSkills}
                   disabled={skillsSaveLoading}
                   variant="premium"
-                  className="h-11 px-6 ml-auto text-xs font-semibold"
+                  className="w-full h-11 px-6 ml-auto text-xs font-semibold"
                 >
                   {skillsSaveLoading ? (
                     <>
@@ -950,10 +950,10 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3.5">
                     <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-400">
-                      <Github className="w-5 h-5" />
+                      <Github className="w-5 h-5 sm:w-3 sm:h-3" />
                     </div>
                     <div>
-                      <h4 className="font-bold" style={{ color: 'var(--text-primary)' }}>GitHub Crawlers</h4>
+                      <h4 className="font-bold sm:text-sm" style={{ color: 'var(--text-primary)' }}>GitHub Crawlers</h4>
                       <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
                         {githubAnalytics.connected ? `Synced: @${githubAnalytics.username}` : 'Disconnected'}
                       </p>
@@ -1043,7 +1043,7 @@ export default function SettingsPage() {
                     size="sm"
                     onClick={handleExportData}
                     disabled={isExporting}
-                    className="h-9 text-[10px] border-indigo-500/30 hover:bg-indigo-500/10 hover:text-white"
+                    className="h-9 w-full text-[10px] border-indigo-500/30 hover:bg-indigo-500/10 hover:text-white"
                   >
                     {isExporting ? 'Exporting...' : 'Download JSON Data'}
                   </Button>
@@ -1073,7 +1073,7 @@ export default function SettingsPage() {
                     size="sm"
                     onClick={() => importFileRef.current?.click()}
                     disabled={isImporting}
-                    className="h-9 text-[10px] border-indigo-500/30 hover:bg-indigo-500/10 hover:text-white"
+                    className="h-9 w-full text-[10px] border-indigo-500/30 hover:bg-indigo-500/10 hover:text-white"
                   >
                     {isImporting ? 'Importing...' : 'Upload JSON Data'}
                   </Button>
@@ -1113,7 +1113,7 @@ export default function SettingsPage() {
                     variant="outline"
                     size="sm"
                     onClick={handleResetOnboarding}
-                    className="h-9 text-[10px] border-rose-500/30 hover:bg-rose-500/10 hover:text-white"
+                    className="h-9 w-full text-[10px] border-rose-500/30 hover:bg-rose-500/10 hover:text-white"
                   >
                     Reset Onboarding State
                   </Button>
