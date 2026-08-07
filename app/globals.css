@@ -310,6 +310,82 @@ pre {
 }
 
 /* ─────────────────────────────────────────────────
+   MARKDOWN BODY — AI Mentor Responses (issue #40)
+   Theme-aware styling for rendered AI markdown.
+───────────────────────────────────────────────── */
+.markdown-body {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.markdown-body > *:first-child { margin-top: 0; }
+.markdown-body > *:last-child { margin-bottom: 0; }
+
+.markdown-body code:not(pre code) {
+  background-color: var(--hover-bg);
+  color: var(--color-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.375rem;
+  padding: 0.1rem 0.375rem;
+  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+}
+
+.markdown-body pre {
+  margin: 0.75rem 0;
+  border-radius: 0.75rem;
+}
+
+.markdown-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.markdown-body a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+}
+
+.markdown-body a:hover { filter: brightness(1.15); }
+
+.markdown-body blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 0.75rem;
+  margin: 0.75rem 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--border-medium);
+  margin: 1rem 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.markdown-body li { margin: 0.25rem 0; }
+.markdown-body li > p { margin: 0; }
+
+.markdown-body h1 { font-size: 1.15rem; margin: 1rem 0 0.5rem; }
+.markdown-body h2 { font-size: 1.05rem; margin: 1rem 0 0.5rem; }
+.markdown-body h3 { font-size: 1rem;    margin: 0.75rem 0 0.4rem; }
+.markdown-body h4 { font-size: 0.95rem; margin: 0.6rem 0 0.35rem; }
+.markdown-body h5 { font-size: 0.85rem; margin: 0.5rem 0 0.3rem; }
+.markdown-body h6 { font-size: 0.8rem;  margin: 0.5rem 0 0.3rem; }
+
+.markdown-body p { margin: 0.5rem 0; }
+
+/* ─────────────────────────────────────────────────
    INPUT PLACEHOLDER COLOUR
    Placeholder colour cannot be set via inline styles,
    so we handle it here using the CSS token.
