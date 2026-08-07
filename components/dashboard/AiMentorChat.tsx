@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, Trash2, Send, Bot, User, Brain } from 'lucide-react';
 import TypingIndicator from '../ai/TypingIndicator';
 import MarkdownContent from '../ai/MarkdownContent';
+import MarkdownRenderer from '../ai/MarkdownRenderer';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -249,10 +250,10 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
                 {m.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
               </div>
               <div
-                className={`rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed ${
+                className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   m.role === 'user'
-                    ? 'rounded-tr-none'
-                    : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none flex flex-col gap-2'
+                    ? 'whitespace-pre-wrap rounded-tr-none'
+                    : 'border border-white/10 text-slate-200 rounded-tl-none flex flex-col gap-2'
                 }`}
                 style={
   m.role === "user"
@@ -260,7 +261,9 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
         backgroundColor: "var(--color-primary)",
         color: "#fff",
       }
-    : undefined
+    : {
+        backgroundColor: "var(--hover-bg)",
+      }
 }
               >
                 <div>
@@ -270,6 +273,11 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
                     <MarkdownContent>{m.content}</MarkdownContent>
                   )}
                 </div>
+                {m.role === 'user' ? (
+                  <div>{m.content}</div>
+                ) : (
+                  <MarkdownRenderer content={m.content} />
+                )}
                 {m.role !== 'user' && (
                   <div className="pt-2 flex justify-start border-t border-white/5 mt-1">
                     <button
