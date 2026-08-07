@@ -363,8 +363,9 @@ function useMarkdownComponents(isDark: boolean): Components {
         );
       }
 
-      const language = match ? match[1] : detectLanguage();
       const value = String(children).replace(/\n$/, '');
+      const language = match ? match[1] : detectLanguage(value);
+
 
       return (
         <CodeBlock
