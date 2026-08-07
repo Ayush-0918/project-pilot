@@ -24,30 +24,36 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
+let exportedConfig = nextConfig;
 
-  org: "project-pilot",
-  project: "nextjs",
+if (process.env.NODE_ENV === "production") {
+  exportedConfig = withSentryConfig(nextConfig, {
+    // For all available options, see:
+    // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  // Only print logs for uploading source maps in CI or production builds
-  silent: !process.env.CI,
+    org: "project-pilot",
+    project: "nextjs",
 
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+    // Only print logs for uploading source maps in CI or production builds
+    silent: !process.env.CI,
 
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
+    // For all available options, see:
+    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-  // Automatically annotate React components to show their full name in breadcrumbs and profiles
-  reactComponentAnnotation: {
-    enabled: true,
-  },
+    // Upload a larger set of source maps for prettier stack traces (increases build time)
+    widenClientFileUpload: true,
 
-  // Hides source maps from visitors
-  hideSourceMaps: true,
+    // Automatically annotate React components to show their full name in breadcrumbs and profiles
+    reactComponentAnnotation: {
+      enabled: true,
+    },
 
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-});
+    // Hides source maps from visitors
+    hideSourceMaps: true,
+
+    // Automatically tree-shake Sentry logger statements to reduce bundle size
+    disableLogger: true,
+  });
+}
+
+export default exportedConfig;
