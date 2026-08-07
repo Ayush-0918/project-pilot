@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
+import MarkdownContent from './MarkdownContent';
 import { Button } from '@/components/ui/Button';
 import { Send, Sparkles, AlertTriangle, RefreshCw, Brain } from 'lucide-react';
 import TypingIndicator from './TypingIndicator';
@@ -76,6 +77,9 @@ export default function ChatInterface() {
               <span className="font-bold text-[10px] text-indigo-300 uppercase tracking-wider">
                 {m.role === 'user' ? 'You' : 'ProjectPilot AI'}
               </span>
+              <div className="prose prose-invert max-w-none text-xs leading-relaxed">
+                <MarkdownContent>{m.content}</MarkdownContent>
+              </div>
               {m.role === 'user' ? (
                 <div className="whitespace-pre-wrap text-xs leading-relaxed">
                   {m.content}

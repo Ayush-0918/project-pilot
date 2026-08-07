@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Loader2, Trash2, Send, Bot, User, Brain } from 'lucide-react';
 import TypingIndicator from '../ai/TypingIndicator';
+import MarkdownContent from '../ai/MarkdownContent';
 import MarkdownRenderer from '../ai/MarkdownRenderer';
 
 interface Message {
@@ -265,6 +266,13 @@ export function AiMentorChat({ userContext }: AiMentorChatProps) {
       }
 }
               >
+                <div>
+                  {m.role === 'user' ? (
+                    m.content
+                  ) : (
+                    <MarkdownContent>{m.content}</MarkdownContent>
+                  )}
+                </div>
                 {m.role === 'user' ? (
                   <div>{m.content}</div>
                 ) : (
