@@ -223,15 +223,15 @@ export default function MainDashboardPage() {
   const activeRecommendedProject = projects[0];
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="w-full min-w-0 space-y-6 sm:space-y-8 lg:px-0 overflow-x-hidden">
       {/* Welcome Banner */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-panel p-6 sm:p-8 rounded-3xl border-indigo-500/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+        className="glass-panel rounded-3xl border-indigo-500/25 flex flex-col md:flex-row px-6 sm:px-4 items-start md:items-center justify-between gap-6"
         style={{ backgroundColor: "var(--surface-card)" }}
       >
-        <div className="space-y-2">
+        <div className="space-y-2 py-6 sm:px-6 overflow-x-hidden">
           <div className="flex items-center space-x-2 text-indigo-400">
             <Sparkles
               className="w-4 h-4 animate-spin"
@@ -270,12 +270,12 @@ export default function MainDashboardPage() {
       </motion.div>
 
       {/* Main Core Widgets Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3 lg:gap-8"> 
         {/* WIDGET 1: CAREER READINESS RADAR */}
         <Card
           hoverEffect={true}
           glowColor="#6366f1"
-          className="bg-[#08051e]/40 lg:col-span-2 flex flex-col justify-between"
+          className="w-full min-w-0 bg-[#08051e]/40 lg:col-span-2 flex flex-col justify-between"
         >
           <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/5">
             <div className="space-y-1">
@@ -308,7 +308,7 @@ export default function MainDashboardPage() {
               
               {/* Compare form */}
               <div className="space-y-1 w-full md:w-auto">
-                <form onSubmit={handleCompare} className="flex gap-2 w-full">
+                <form onSubmit={handleCompare} className="flex flex-col gap-2 w-full sm:flex-row">
                   <input
                     type="text"
                     placeholder="Compare with developer..."
@@ -317,7 +317,7 @@ export default function MainDashboardPage() {
                       setCompareUsername(e.target.value);
                       if (compareError) setCompareError(null);
                     }}
-                    className={`h-8 text-xs rounded-xl px-3 bg-white/5 border text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all w-full md:w-40 ${
+                    className={`h-9 text-xs rounded-xl px-3 bg-white/5 border text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all w-full md:w-40 sm:w-40${
                       compareError ? 'border-rose-500/50' : 'border-white/10'
                     }`}
                     disabled={isComparing}
@@ -326,7 +326,7 @@ export default function MainDashboardPage() {
                     type="submit"
                     variant="glow"
                     size="sm"
-                    className="h-8 text-xs font-semibold shrink-0 py-0 px-3"
+                    className="h-8 text-xs font-semibold shrink-0 py-0 px-3 w-full sm:w-auto"
                     isLoading={isComparing}
                     disabled={!compareUsername.trim()}
                   >
@@ -352,7 +352,7 @@ export default function MainDashboardPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="h-[280px] sm:h-[320px] flex items-center justify-center pt-4">
+          <CardContent className="w-full min-w-0 h-[300px] sm:h-[320px] flex items-center justify-center p-2 sm:p-4 overflow-x-hidden">
             <SkillRadarChart
               data={radarData}
               userName={user?.name || clerkUser?.firstName || 'You'}
@@ -471,7 +471,7 @@ export default function MainDashboardPage() {
       </div>
 
       {/* Grid: Recommended Project, Gaps, Weekly schedule */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3 lg:gap-8">
         {/* Recommended Project Blueprint */}
         {(() => {
           const themeColor = activeRecommendedProject?.difficulty === 'Advanced' 
@@ -493,7 +493,7 @@ export default function MainDashboardPage() {
                   boxShadow: 'inset 0 -12px 24px rgba(255, 255, 255, 0.04)',
                 }}
               >
-                <CardHeader className="pb-3 flex flex-row items-start justify-between">
+                <CardHeader className="pb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="flex items-center space-x-2 text-indigo-400 mb-1">
                       <Cpu className="w-4 h-4" />
@@ -502,7 +502,7 @@ export default function MainDashboardPage() {
                     <CardTitle className="text-lg font-bold">{activeRecommendedProject?.title}</CardTitle>
                     <CardDescription className="text-xs">{activeRecommendedProject?.tagline}</CardDescription>
                   </div>
-                  <Badge variant="glow">★ Impact: +45% Score</Badge>
+                  <Badge variant="glow" className="self-start sm:self-auto shrink-0 whitespace-nowrap">★ Impact: +45% Score</Badge>
                 </CardHeader>
                 <CardContent className="text-xs sm:text-sm space-y-4 pt-1 flex-1" style={{ color: 'var(--text-secondary)' }}>
                   <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{activeRecommendedProject?.description}</p>
@@ -524,8 +524,8 @@ export default function MainDashboardPage() {
                 <CardFooter className="pt-2 border-t border-white/5">
                   <Button 
                     variant="glow" 
-                    className="w-full text-xs h-11" 
-                    rightIcon={<ChevronRight className="w-4 h-4" />}
+                    className="w-full sm:px-2 text-xs h-11" 
+                    rightIcon={<ChevronRight className="w-4 h-4 sm:w-3" />}
                     onClick={() => {
                       if (activeRecommendedProject) {
                         selectProject(activeRecommendedProject.id);
@@ -606,11 +606,11 @@ export default function MainDashboardPage() {
       </div>
 
       {/* Commit Activity and Weekly planner Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3 lg:gap-8">
         {/* GitHub Commit Graphs (Recharts) */}
         <Card
           hoverEffect={true}
-          className="bg-[#08051e]/40 lg:col-span-2 flex flex-col justify-between"
+          className="w-full min-w-0 bg-[#08051e]/40 lg:col-span-2 flex flex-col justify-between"
         >
           <CardHeader className="pb-2">
             <div className="flex items-center space-x-2 text-indigo-400 mb-1">
@@ -632,7 +632,7 @@ export default function MainDashboardPage() {
               Commit consistency scores measured from active repository pushes.
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[200px] pt-4">
+          <CardContent className="w-full min-w-0 h-[200px] pt-4">
             <CommitBarChart data={commitData} />
           </CardContent>
           <CardFooter

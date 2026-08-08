@@ -222,14 +222,14 @@ export default function DashboardLayout({
   const getPageTitle = () => {
     if (pathname === '/dashboard') return 'Dashboard';
     if (pathname.startsWith('/dashboard/projects'))
-      return 'Recommended Projects';
+      return 'Projects';
     if (pathname.startsWith('/dashboard/roadmaps'))
-      return 'Day-by-Day Roadmaps';
+      return 'Roadmaps';
     if (pathname.startsWith('/dashboard/mentor')) return 'AI Mentor Workspace';
     if (pathname.startsWith('/dashboard/github'))
-      return 'GitHub Deep Analytics';
+      return 'GitHub Analytics';
     if (pathname.startsWith('/dashboard/career'))
-      return 'Career Readiness Score';
+      return 'Career Score';
     if (pathname.startsWith('/dashboard/settings')) return 'System Settings';
     return 'Dashboard';
   };
@@ -241,16 +241,19 @@ export default function DashboardLayout({
      * changes on <html>.  All hard-coded hex colours have been replaced.
      */
     <div
-      className='flex min-h-screen overflow-hidden'
+      className='relative flex min-h-screen w-full max-w-full overflow-hidden'
       style={{
         backgroundColor: 'var(--background)',
         color: 'var(--foreground)',
       }}
     >
       {/* Dynamic Background glowing canvas */}
-      <div className='absolute top-[20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none' />
-      <div className='absolute bottom-[20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-[120px] pointer-events-none' />
 
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className='absolute top-[20%] right-0 translate-x-1/2 w-[400px] h-[400px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none' />
+        <div className='absolute bottom-[20%] left-0 translate-x-1/2 w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-[120px] pointer-events-none' />
+
+      </div>
       {/* Desktop Sidebar (Left Panel) */}
       {!isReadingMode && (
         <Sidebar
@@ -260,11 +263,11 @@ export default function DashboardLayout({
       )}
 
       {/* Main Workspace Frame (Right Panel) */}
-      <div className='flex-1 flex flex-col min-w-0 overflow-y-auto h-screen relative'>
+      <div className='flex-1 flex flex-col min-w-0 overflow-x-hidden overflow-y-auto h-screen relative'>
         {/* Mobile Header (Topbar for small viewports) */}
         {!isReadingMode && (
           <header
-            className='md:hidden flex items-center justify-between min-h-[84px] py-4 px-6 border-b sticky top-0 z-40 backdrop-blur-xl'
+            className='sticky top-0 z-30 grid min-h-[76px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-3 backdrop-blur-xl sm:px-6 lg:hidden'
             style={{
               backgroundColor:
                 'color-mix(in srgb, var(--surface-primary) 90%, transparent)',
@@ -283,7 +286,7 @@ export default function DashboardLayout({
               </span>
             </Link>
 
-            <div className='flex items-center space-x-3'>
+            <div className='flex shrink-0 items-center space-x-3'>
               {/* Mobile theme toggle */}
               <button
                 type='button'
@@ -335,14 +338,14 @@ export default function DashboardLayout({
         {/* Global Desktop Workspace Topbar */}
         {!isReadingMode && (
           <header
-            className='hidden md:flex items-center justify-between min-h-[88px] py-4 px-8 border-b sticky top-0 backdrop-blur-xl z-30 shadow-sm'
+            className='sticky top-0 z-30 hidden min-h-[88px] items-center justify-between gap-8 border-b px-6 py-4 backdrop-blur-xl lg:flex lg:px-8'
             style={{
               backgroundColor:
                 'color-mix(in srgb, var(--surface-primary) 90%, transparent)',
               borderColor: 'var(--border-subtle)',
             }}
           >
-            <div className='flex items-center space-x-4'>
+            <div className='flex min-w-0 items-center gap-3'>
               <h1
                 className='text-xl font-extrabold tracking-tight'
                 style={{ color: 'var(--text-primary)' }}
@@ -351,17 +354,17 @@ export default function DashboardLayout({
               </h1>
               <Badge
                 variant='glow'
-                className='text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full border border-indigo-500/30'
+                className='hidden shrink-0 px-3 py-1 uppercase lg:inline-flex'
               >
                 Ready Score: {careerScore.overallScore}%
               </Badge>
             </div>
 
             {/* Top Actions: Search, Theme, Notify, Profile */}
-            <div className='flex items-center space-x-4'>
+            <div className='flex shrink-0 items-center'>
               {/* Functional page live search */}
-              <div
-                className="hidden sm:flex items-center gap-3 h-11 min-w-60 lg:min-w-64 px-4 rounded-2xl border transition-all shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500/80"
+              {/* <div
+                className="hidden h-11 min-w-56 items-center gap-3 rounded-2xl border px-4 transition-all focus-within:ring-2 focus-within:ring-[var(--color-primary)] lg:flex"
                 style={{
                   borderColor: 'var(--border-subtle)',
                   backgroundColor: 'var(--hover-bg)',
@@ -388,7 +391,7 @@ export default function DashboardLayout({
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
-              </div>
+              </div> */}
 
               {/* Functional global command search */}
               <button
@@ -465,7 +468,7 @@ export default function DashboardLayout({
         {/* Main Dashboard Pages Slot (Children content) */}
         <div 
           id="dashboard-content-area"
-          className={isReadingMode ? "flex-1 w-full relative z-10" : "flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto relative z-10"}
+          className={isReadingMode ? "flex-1 w-full min-w-0 max-w-full overflow-x-hidden relative z-10 md:overflow-x-hidden" : "flex-1 min-w-0 max-w-full w-full mx-auto px-6 pt-6 sm:px-4 relative z-10 overflow-x-hidden md:overflow-x-hidden"}
         >
           <GlobalKeyboardShortcuts 
             onOpenCommandPalette={() => setCommandPaletteOpen((prev) => !prev)}

@@ -65,7 +65,7 @@ function SortableStepCard({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative">
+    <div ref={setNodeRef} style={style} className="relative overflow-x-hidden">
       <div className="relative">
         <button
           onClick={() => toggleStepCompletion(projectId, step.id)}

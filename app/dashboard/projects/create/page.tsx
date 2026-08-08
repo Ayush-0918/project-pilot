@@ -165,7 +165,7 @@ export default function CreateProjectPage() {
   const isRetryable = createError?.type === 'NETWORK' || createError?.type === 'SERVER';
 
   return (
-    <div className="space-y-8 pb-12 max-w-4xl mx-auto">
+    <div className="space-y-8 pb-12 max-w-4xl mx-auto overflow-x-hidden">
       <Link href="/dashboard/projects" className="inline-flex items-center text-sm font-semibold text-slate-400 hover:text-white transition-colors">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back to Projects

@@ -64,7 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col h-screen sticky top-0 border-r transition-all duration-300 z-30',
+        'hidden lg:flex flex-col h-screen sticky top-0 border-r transition-all duration-300 z-30',
         collapsed ? 'w-20' : 'w-64'
       )}
       style={{

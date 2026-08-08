@@ -150,41 +150,41 @@ export default function RecommendedProjectsPage() {
     return <RecommendedProjectsSkeleton />;
   }
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
-            <FolderGit2 className="w-6 h-6 text-indigo-400" />
+    <div className="w-full space-y-6 sm:space-y-8 overflow-x-hidden">
+      <div className="flex flex-col px-6 gap-4 sm:flex-row sm:items-start sm:justify-between md:flex-row min-w-0">
+        <div className="py-6 min-w-0 sm:items-start">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-start space-x-2 min-w-0">
+            <FolderGit2 className="w-6 h-6 sm:w-5 sm:h-5 sm:items-start shrink-0 text-indigo-400" />
             <span>Recommended Project blue-prints</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs lg:pr-2 sm:text-sm text-slate-400 mt-1">
             Custom engineered portfolios created to shut down your structural skill gaps.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
-          <Link href="/dashboard/projects/create">
+        <div className="flex flex-col w-full items-start gap-3 self-center sm:flex-row sm:w-auto sm:self-center">
+          <Link href="/dashboard/projects/create" className="w-full sm:w-auto">
             <Button
               variant="premium"
               size="sm"
-              className="h-10 px-4 text-xs font-bold shadow-md shadow-indigo-500/20"
+              className="h-10 w-full px-2 text-xs font-bold shadow-md shadow-indigo-500/20 sm:w-auto shrink-0"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Create Project
             </Button>
           </Link>
 
-          <Badge variant="glow" className="w-fit px-3 py-1 font-mono font-bold">
-            🛩 ACTIVE TARGET: {projects.length} OPTIONS LOADED
+          <Badge variant="glow" className="w-fit sm:w-fit px-2 py-1 font-mono font-bold">
+            🛩 ACTIVE TARGET: {projects.length} OPTIONS LOADED 
           </Badge>
         </div>
       </div>
 
       {/* Filter and Search Action Box */}
-      <div className="glass-panel p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 bg-[#08051e]/40">
+      <div className="glass-panel p-4 sm:p-3 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 w-full min-w-0 bg-[#08051e]/40">
 
         {/* Search Field */}
-        <div className="relative w-full md:w-80">
+        <div className="relative w-full md:w-80 md:shrink-0">
           <label htmlFor="project-search" className="sr-only">Search projects</label>
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true" />
           <input
@@ -193,19 +193,19 @@ export default function RecommendedProjectsPage() {
             placeholder="Search projects or technologies..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#0a071a]/50 text-xs rounded-xl border border-white/5 px-4 py-3 pl-11 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus:border-indigo-500/55 text-slate-200 placeholder-slate-500"
+            className="w-full min-w-0 bg-[#0a071a]/50 text-xs rounded-xl border border-white/5 px-4 py-3 pl-11 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus:border-indigo-500/55 text-slate-200 placeholder-slate-500"
           />
         </div>
 
         {/* Tab Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto" role="group" aria-label="Filter projects by difficulty">
+        <div className="flex flex-wrap min-w-0 items-center gap-1.5 w-full md:w-auto" role="group" aria-label="Filter projects by difficulty">
           {(['All', 'Beginner', 'Intermediate', 'Advanced'] as const).map((tab) => (
             <button
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
               aria-pressed={activeTab === tab}
-              className={`px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeTab === tab
+              className={`min-h-10 px-4 sm:px-2 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeTab === tab
                 ? 'bg-indigo-600/15 border-indigo-500/30 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.05)]'
                 : 'bg-transparent border-white/5 text-slate-400 hover:text-white hover:bg-white/2'
                 }`}
@@ -257,8 +257,8 @@ export default function RecommendedProjectsPage() {
             }}
           />
         ) : (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="w-full min-w-0 space-y-8 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full min-w-0">
               {displayedProjects.map((project) => {
                 const isSelected = selectedProjectId === project.id;
                 const projectStatus = getProjectStatus(project);
@@ -292,10 +292,10 @@ export default function RecommendedProjectsPage() {
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <TiltWrapper className="h-full">
+                    <TiltWrapper className="h-full min-w-0">
                       <Card
                         hoverEffect={false}
-                        className={`relative border bg-[#070519]/95 rounded-2xl h-full transition-all duration-300 ${borderStyles[project.difficulty] || 'border-white/5'
+                        className={`relative flex flex-col min-w-0 justify-between overflow-hidden border bg-[#070519]/95 rounded-2xl h-full transition-all duration-300 ${borderStyles[project.difficulty] || 'border-white/5'
                           } flex h-full flex-col justify-between`}
                         style={{
                           backgroundImage: `
@@ -309,9 +309,9 @@ export default function RecommendedProjectsPage() {
                       >
 
 
-                        <div className="space-y-4 w-full">
+                        <div className="space-y-4 min-w-0 w-full">
                           {/* Difficulty / Status / Active Target / Duration — single row */}
-                          <div className="flex items-center justify-between gap-2">
+                          <div className="flex min-w-0 items-center justify-between gap-2">
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge variant={diffColors[project.difficulty] || 'default'}>
                                 {project.difficulty}
@@ -330,7 +330,7 @@ export default function RecommendedProjectsPage() {
                             </div>
                           </div>
 
-                          <div>
+                          <div className="min-w-0">
                             <h3 className="text-lg font-bold text-white">{project.title}</h3>
                             <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-slate-400">
                               {project.category}
@@ -353,14 +353,16 @@ export default function RecommendedProjectsPage() {
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-2.5 rounded-xl border border-white/5 bg-white/2 p-2.5 text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
-                            <TrendingUp className="h-4 w-4 shrink-0 text-indigo-400" />
-                            <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+                          <div className="flex min-w-0 items-start justify-between space-x-2.5 rounded-xl border border-white/5 bg-white/2 p-2.5 text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                            <div className="flex min-w-0 items-center gap-1.5">
+                              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-indigo-400" />
+                              <span className="font-semibold text-slate-300 flex items-center gap-1.5">
                               ★ Resume Score Boost: <span className="font-extrabold" style={{ color: themeColor }}>+{project.resumeValue}%</span>
-                              <Tooltip content="Estimated increase to your resume's recruiter match rate if you complete this project, based on the skills and technologies it covers.">
-                                <Info className="h-3 w-3 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Resume score boost information" />
-                              </Tooltip>
-                            </span>
+                              </span>
+                            </div>
+                            <Tooltip content="Estimated increase to your resume's recruiter match rate if you complete this project, based on the skills and technologies it covers.">
+                              <Info className="h-3 w-3 cursor-help text-slate-500 hover:text-indigo-400 transition-colors" aria-label="Resume score boost information" />
+                            </Tooltip>
                           </div>
 
                           <p className="text-xs leading-relaxed text-slate-400 line-clamp-3">
@@ -370,7 +372,7 @@ export default function RecommendedProjectsPage() {
                           {/* Dynamic checklist for project skills */}
                           <div className="space-y-2 pt-1">
                             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Keys to Blueprint</span>
-                            <ul className="space-y-2">
+                            <ul className="space-y-2 pt-1">
                               {project.skillsGained.slice(0, 3).map((skill) => (
                                 <li key={skill} className="flex items-center space-x-2 text-xs">
                                   <span
