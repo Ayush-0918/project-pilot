@@ -23,7 +23,7 @@ async function getAuthenticatedUserId(): Promise<string> {
   if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
     const session = await auth();
     userId = session.userId;
-  } else if (process.env.NODE_ENV === 'development') {
+  } else if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
     userId = 'mock-developer-id';
   }
 
@@ -37,33 +37,62 @@ async function getAuthenticatedUserId(): Promise<string> {
 /**
  * Fetches all projects associated with the current user with pagination support.
  */
-export async function getUserProjects(take?: number, skip?: number) {
+export async function getUserProjects(
+  take: number = 20,
+  skip: number = 0,
+  search?: string,
+  status?: string,
+) {
   try {
     const clerkId = await getAuthenticatedUserId();
     
     // First, find the user database ID using the Clerk ID
     const dbUser = await prisma.user.findUnique({
-      where: { clerkId },
-      include: {
-        projects: {
-          ...(take !== undefined ? { take } : {}),
-          ...(skip !== undefined ? { skip } : {}),
-          include: {
-            activities: {
-              orderBy: { createdAt: 'desc' }
-            },
-            milestones: {
-              orderBy: {
-                dueDate: 'asc'
-              }
-            }
-        },
-          orderBy: { updatedAt: 'desc' }
-        }
-      }
+      where: { clerkId }
     });
 
-    return dbUser?.projects || [];
+    if (!dbUser) return [];
+
+    const whereClause: any = {
+      userId: dbUser.id,
+    };
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    if (search) {
+      whereClause.OR = [
+        {
+          title: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          tags: {
+            has: search,
+          },
+        },
+      ];
+    }
+
+    return await prisma.project.findMany({
+      where: whereClause,
+      take,
+      skip,
+      include: {
+        activities: {
+          orderBy: { createdAt: 'desc' }
+        },
+        milestones: {
+          orderBy: {
+            dueDate: 'asc'
+          }
+        }
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
   } catch (error) {
     console.error('Failed to retrieve user projects from database:', error);
     return [];
