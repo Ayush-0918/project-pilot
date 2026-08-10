@@ -65,7 +65,7 @@ export default function MilestoneList({ milestones }: Props) {
                   </Badge>
 
                   {overdue && (
-                    <Badge variant="destructive">
+                    <Badge variant="danger">
                       Overdue
                     </Badge>
                   )}
