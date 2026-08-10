@@ -22,7 +22,8 @@ model User {
   onboardingCompleted Boolean        @default(false)
 portfolioPublic     Boolean        @default(false)
   deletedAt           DateTime?
-  projects            Project[]  notifications       Notification[]
+  projects            Project[]
+  notifications       Notification[]
   activities          Activity[]
   subscription        Subscription?
   aiMessages          AiMessage[]
